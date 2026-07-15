@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Fleteros · Lago Puelo S.A. + Elebes S.A.</title>
+  <meta name="description" content="Efectividad de entrega y cantidad de repartos de los fleteros de Lago Puelo S.A. y Elebes S.A." />
+  <meta name="theme-color" content="#1C2B3A" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231C2B3A'/%3E%3Ctext x='50' y='64' font-family='Arial' font-size='34' font-weight='bold' fill='white' text-anchor='middle'%3EL·E%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=20260715c" />
+  <style>
+    /* Foto de fondo del encabezado (se ve al dejar la imagen en assets/img/fondo-superior.jpg).
+       Si el archivo no existe, se muestra el degradado de marca. */
+    .hero::before { --hero-photo: url("assets/img/fondo-superior.jpg"); }
+  </style>
+</head>
+<body>
+
+  <!-- Splash con doble red de seguridad (CSS + JS) -->
+  <div id="splash">
+    <div style="text-align:center">
+      <div class="splash__logo">L·E</div>
+      <div class="splash__txt">Cargando panel…</div>
+    </div>
+  </div>
+
+  <!-- Encabezado / Hero -->
+  <header class="hero">
+    <div class="hero__bar">
+      <img class="brand-logo" src="assets/img/logo-lagopuelo.jpg"
+           alt="Logo Lago Puelo S.A."
+           onerror="this.classList.add('brand-logo--fallback');this.removeAttribute('src');this.alt='';this.textContent='LP';" />
+      <img class="brand-logo" src="assets/img/logo-elebes.jpg"
+           alt="Logo Elebes S.A."
+           onerror="this.classList.add('brand-logo--fallback');this.removeAttribute('src');this.alt='';this.textContent='EL';" />
+      <div class="brand-txt">
+        <span class="brand-name">Lago Puelo S.A. + Elebes S.A.</span>
+        <span class="brand-sub">Panel de fleteros</span>
+      </div>
+    </div>
+    <div class="hero__title">
+      <h1>Tu efectividad, día a día</h1>
+      <p>Consultá tu efectividad de entrega y tus repartos del mes. Se actualiza todos los días.</p>
+      <span class="hero__update"><span class="dot"></span> Actualizado: <b id="update-date">—</b></span>
+    </div>
+  </header>
+
+  <!-- Panel dinámico -->
+  <main>
+    <div id="panel"><p class="muted">Cargando datos…</p></div>
+  </main>
+
+  <footer class="foot">
+    <b>Lago Puelo S.A. + Elebes S.A.</b> · Panel interno de fleteros<br>
+    <small>La efectividad general y el ranking salen del reporte oficial de repartos.
+    Los anillos por empresa se calculan del detalle de ventas.</small>
+  </footer>
+
+  <!-- Datos primero, lógica después (patrón IIFE, sin módulos ES) -->
+  <script defer src="data.js?v=20260715c"></script>
+  <script defer src="app.js?v=20260715c"></script>
+</body>
+</html>
