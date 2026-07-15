@@ -309,7 +309,7 @@
           '<i class="chart__track"><i class="rank__fill rank__fill--low" style="width:2%" data-w="' + w + '"></i></i>' +
         '</div>';
       }).join("");
-      card.innerHTML = '<h2 class="chart__title">📋 Motivos de sus boletas rechazadas · ' + total + ' en total</h2>' + rowsM;
+      card.innerHTML = '<h2 class="chart__title">📋 Motivos de sus boletas rechazadas</h2>' + rowsM;
       cont.appendChild(card);
     }
 
