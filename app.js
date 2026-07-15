@@ -128,12 +128,16 @@
 
     // Tarjetas de totales del mes
     var nombres = Object.keys(porFletero);
-    var proms = el("div", "avgs reveal");
-    proms.innerHTML =
+    var cli = datos.clientes || null;
+    var celdas =
       '<div class="avg"><span class="avg__k">Repartos de ' + mesNombre + '</span><b>' + fmtNum(totRep) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Boletas sacadas</span><b>' + fmtNum(totB) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(totE) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Fleteros activos</span><b>' + nombres.length + '</b></div>';
+      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(totE) + ' / ' + fmtNum(totB) + '</b></div>';
+    if (cli && cli.sac > 0) {
+      celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(cli.ent) + ' / ' + fmtNum(cli.sac) + '</b></div>';
+    }
+    celdas += '<div class="avg"><span class="avg__k">Fleteros activos</span><b>' + nombres.length + '</b></div>';
+    var proms = el("div", "avgs reveal");
+    proms.innerHTML = celdas;
     cont.appendChild(proms);
 
     // Ranking único: todos los fleteros de las dos empresas
@@ -219,7 +223,7 @@
 
   function cargar() {
     var d = window.__LPE_DATA__ || {};
-    var datos = { registros: d.registros || [], empresas: d.empresas || [] };
+    var datos = { registros: d.registros || [], empresas: d.empresas || [], clientes: d.clientes || null };
     ultimaActualizacion(datos.registros);
     render(datos);
   }
