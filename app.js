@@ -1,8 +1,9 @@
 /* ==========================================================================
    Lago Puelo S.A. + Elebes S.A. — Panel de Fleteros
    app.js  ·  Lógica de la herramienta (vanilla JS, sin dependencias)
-   - Anillo GENERAL y ranking: del reporte oficial de repartos (registros).
-   - Anillos por EMPRESA: del detalle de ventas (empresas), calculados por el robot.
+   - Anillo GENERAL, ranking y boletas: del reporte oficial de repartos.
+   - Anillos por EMPRESA, clientes, motivos, vendedores y proveedores:
+     del detalle de ventas (los genera el robot en data.js).
    ========================================================================== */
 (function () {
   "use strict";
@@ -38,6 +39,7 @@
   function fmtNum(n) {
     return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   }
+  function esc(s) { return String(s).replace(/"/g, "&quot;"); }
 
   // ---- Componentes visuales --------------------------------------------
   function anillo(pValue, etiqueta, sub, general) {
@@ -89,49 +91,70 @@
     return '<span class="chip chip--' + c + '">' + t + "</span>";
   }
 
-  // ---- Vista única: resumen general + ranking ---------------------------
-  function vistaGeneral(datos) {
-    var cont = el("div", "view");
-    var registros = datos.registros;
+  // Tarjeta gráfica de barras horizontales (una serie de cantidades).
+  function graficoBarras(titulo, items, unidad, colorClase) {
+    if (!items || !items.length) return null;
+    var max = items[0].cantidad || 1;
+    items.forEach(function (it) { if (it.cantidad > max) max = it.cantidad; });
+    var card = el("div", "chart reveal");
+    var rows = items.map(function (it) {
+      var w = Math.max(4, Math.round(100 * it.cantidad / max));
+      return '<div class="chart__row" title="' + esc(it.etiqueta) + ' · ' + it.cantidad + ' ' + unidad + '">' +
+        '<div class="chart__top"><span class="chart__label">' + it.etiqueta + '</span>' +
+        '<b class="chart__val">' + it.cantidad + '</b></div>' +
+        '<i class="chart__track"><i class="rank__fill rank__fill--' + (colorClase || "low") + '" style="width:2%" data-w="' + w + '"></i></i>' +
+      '</div>';
+    }).join("");
+    card.innerHTML = '<h2 class="chart__title">' + titulo + '</h2>' + rows;
+    return card;
+  }
 
-    // Mes en curso = mes de la última fecha con datos
+  // Datos agregados del mes por fletero, desde los registros oficiales.
+  function resumenMes(datos) {
+    var registros = datos.registros;
     var fechas = {};
     registros.forEach(function (r) { fechas[r.fecha] = 1; });
     var fechasTodas = Object.keys(fechas).sort();
     var mesPrefijo = fechasTodas.length ? fechasTodas[fechasTodas.length - 1].slice(0, 7) : "";
     var mesNombre = mesPrefijo ? NOMBRES_MES[parseInt(mesPrefijo.slice(5), 10) - 1] : "mes";
     var delMes = registros.filter(function (r) { return r.fecha.indexOf(mesPrefijo) === 0; });
-
-    // Totales generales del mes (cifra oficial del reporte de repartos)
-    var totB = 0, totE = 0, totRep = 0;
     var porFletero = {};
+    var totB = 0, totE = 0, totRep = 0;
     delMes.forEach(function (r) {
       totB += r.boletas; totE += r.entregadas; totRep += r.repartos;
       var f = porFletero[r.fletero];
-      if (!f) f = porFletero[r.fletero] = { nombre: r.fletero, repartos: 0, boletas: 0, entregadas: 0 };
+      if (!f) f = porFletero[r.fletero] = { nombre: r.fletero, repartos: 0, boletas: 0, entregadas: 0, ultima: "" };
       f.repartos += r.repartos; f.boletas += r.boletas; f.entregadas += r.entregadas;
+      if (r.fecha > f.ultima) f.ultima = r.fecha;
     });
-    var efGeneral = totB > 0 ? totE / totB : null;
+    return { mesNombre: mesNombre, porFletero: porFletero, totB: totB, totE: totE, totRep: totRep };
+  }
+
+  // ---- Vista: resumen general -------------------------------------------
+  function vistaGeneral(datos) {
+    var cont = el("div", "view");
+    var m = resumenMes(datos);
+    var efGeneral = m.totB > 0 ? m.totE / m.totB : null;
 
     // Anillos: general (oficial) + uno por empresa (detalle de ventas)
     var grid = el("div", "metrics reveal");
     var rings = [];
-    var aG = anillo(pct(efGeneral), "Efectividad general", "las dos empresas · " + mesNombre, true);
+    var aG = anillo(pct(efGeneral), "Efectividad general", "las dos empresas · " + m.mesNombre, true);
     grid.appendChild(aG.block); rings.push(aG.wrap);
     (datos.empresas || []).forEach(function (e) {
       var ef = e.boletas > 0 ? (e.boletas - e.rechazadas) / e.boletas : null;
-      var a = anillo(pct(ef), e.nombre, "total " + mesNombre);
+      var a = anillo(pct(ef), e.nombre, "total " + m.mesNombre);
       grid.appendChild(a.block); rings.push(a.wrap);
     });
     cont.appendChild(grid);
     cont._rings = rings;
 
     // Tarjetas de totales del mes
-    var nombres = Object.keys(porFletero);
+    var nombres = Object.keys(m.porFletero);
     var cli = datos.clientes || null;
     var celdas =
-      '<div class="avg"><span class="avg__k">Repartos de ' + mesNombre + '</span><b>' + fmtNum(totRep) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(totE) + ' / ' + fmtNum(totB) + '</b></div>';
+      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(m.totRep) + '</b></div>' +
+      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(m.totE) + ' / ' + fmtNum(m.totB) + '</b></div>';
     if (cli && cli.sac > 0) {
       celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(cli.ent) + ' / ' + fmtNum(cli.sac) + '</b></div>';
     }
@@ -140,9 +163,34 @@
     proms.innerHTML = celdas;
     cont.appendChild(proms);
 
+    // Tarjetas gráficas: motivos, fleteros con más clientes no entregados, vendedores
+    var topMotivos = (datos.motivos || []).slice(0, 5).map(function (x) {
+      return { etiqueta: x.motivo, cantidad: x.cantidad };
+    });
+    var statsF = datos.estadisticasFletero || {};
+    var topFleteros = Object.keys(statsF).map(function (n) {
+      return { etiqueta: n, cantidad: statsF[n].recTot || 0 };
+    }).filter(function (x) { return x.cantidad > 0; })
+      .sort(function (a, b) { return b.cantidad - a.cantidad; })
+      .slice(0, 5);
+    var topVend = (datos.vendedoresTop || []).slice(0, 5).map(function (x) {
+      return { etiqueta: x.nombre, cantidad: x.cantidad };
+    });
+
+    var g1 = graficoBarras("📋 Motivos de rechazo más comunes", topMotivos, "rechazos");
+    var g2 = graficoBarras("🚫 Fleteros con más clientes no entregados · " + m.mesNombre, topFleteros, "clientes");
+    var g3 = graficoBarras("🧑‍💼 Vendedores con más boletas rechazadas · " + m.mesNombre, topVend, "boletas");
+    if (g1 || g2 || g3) {
+      var fila = el("div", "charts");
+      if (g1) fila.appendChild(g1);
+      if (g2) fila.appendChild(g2);
+      if (g3) fila.appendChild(g3);
+      cont.appendChild(fila);
+    }
+
     // Ranking único: todos los fleteros de las dos empresas
     var filas = nombres.map(function (n) {
-      var f = porFletero[n];
+      var f = m.porFletero[n];
       return {
         nombre: n,
         repartos: f.repartos,
@@ -160,20 +208,97 @@
       var body = filas.map(function (f, i) {
         var medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
         var bar = Math.max(4, Math.min(100, f.ef || 0));
-        return '<div class="rank__row">' +
+        return '<button class="rank__row" data-fletero="' + esc(f.nombre) + '">' +
           '<span class="rank__pos">' + medal + '</span>' +
           '<span class="rank__name"><b>' + f.nombre + '</b>' +
             '<i class="rank__track"><i class="rank__fill rank__fill--' + claseColor(f.ef) + '" style="width:2%" data-w="' + bar + '"></i></i>' +
           '</span>' +
           '<span class="rank__num rank__reps">' + f.repartos + '<small>repartos</small></span>' +
           '<span class="rank__num">' + chip(f.ef) + '</span>' +
-        '</div>';
+        '</button>';
       }).join("");
       tabla.innerHTML =
-        '<h2 class="rank__title">🚚 Ranking · Efectividad de entrega · total ' + mesNombre + '</h2>' +
+        '<h2 class="rank__title">🚚 Ranking · Efectividad de entrega · total ' + m.mesNombre + '</h2>' +
         '<div class="rank__grid">' + head + body + '</div>' +
-        '<p class="rank__hint">Efectividad y repartos del mes en curso, de las dos empresas juntas.</p>';
+        '<p class="rank__hint">Tocá un fletero para ver su detalle. Efectividad y repartos del mes en curso, de las dos empresas juntas.</p>';
       cont.appendChild(tabla);
+    }
+
+    return cont;
+  }
+
+  // ---- Vista: detalle de un fletero ---------------------------------------
+  function vistaFletero(datos, nombre) {
+    var cont = el("div", "view");
+    var m = resumenMes(datos);
+    var f = m.porFletero[nombre];
+
+    var volver = el("button", "volver", "← Volver al resumen");
+    volver.addEventListener("click", function () {
+      seleccionar("__general__");
+      var sel = $("#selector"); if (sel) sel.value = "__general__";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    cont.appendChild(volver);
+
+    if (!f) { cont.appendChild(el("p", "muted", "Sin datos para este fletero todavía.")); return cont; }
+
+    // Encabezado del fletero
+    var head = el("div", "person");
+    head.innerHTML =
+      '<div class="person__id"><span class="person__avatar">' +
+        (nombre.trim().charAt(0).toUpperCase() || "?") + '</span>' +
+        '<div><h2 class="person__name">' + nombre + '</h2>' +
+        '<p class="person__meta">Último reparto: ' + fmtFecha(f.ultima) + '</p></div></div>';
+    cont.appendChild(head);
+
+    // Anillo con su efectividad del mes (cifra oficial)
+    var ef = f.boletas > 0 ? f.entregadas / f.boletas : null;
+    var grid = el("div", "metrics reveal");
+    var aE = anillo(pct(ef), "Efectividad de entrega", "total " + m.mesNombre, true);
+    grid.appendChild(aE.block);
+    cont.appendChild(grid);
+    cont._rings = [aE.wrap];
+
+    // Sus números del mes
+    var st = (datos.estadisticasFletero || {})[nombre];
+    var celdas =
+      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(f.repartos) + '</b></div>' +
+      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(f.entregadas) + ' / ' + fmtNum(f.boletas) + '</b></div>';
+    if (st && st.cliSac > 0) {
+      celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(st.cliEnt) + ' / ' + fmtNum(st.cliSac) + '</b></div>' +
+        '<div class="avg"><span class="avg__k">Clientes no entregados</span><b class="rojo">' + fmtNum(st.recTot) + '</b></div>';
+    }
+    var proms = el("div", "avgs reveal");
+    proms.innerHTML = celdas;
+    cont.appendChild(proms);
+
+    // Motivos de sus boletas rechazadas (solo boletas completas)
+    var mios = (datos.motivosPorFletero || {})[nombre] || [];
+    if (mios.length) {
+      var total = 0;
+      mios.forEach(function (x) { total += x.cantidad; });
+      var card = graficoBarras("📋 Motivos de sus boletas rechazadas · " + total + " en total",
+        mios.map(function (x) { return { etiqueta: x.motivo, cantidad: x.cantidad }; }), "rechazos");
+      if (card) cont.appendChild(card);
+    }
+
+    // Su entrega por proveedor (% en plata)
+    var provs = (datos.proveedoresPorFletero || {})[nombre] || [];
+    if (provs.length) {
+      var maxP = 0;
+      provs.forEach(function (p) { if (p.pct > maxP) maxP = p.pct; });
+      var cardP = el("div", "chart reveal");
+      var rowsP = provs.map(function (p) {
+        var w = Math.max(4, Math.round(100 * p.pct / (maxP || 1)));
+        return '<div class="chart__row">' +
+          '<div class="chart__top"><span class="chart__label">' + p.prov + '</span>' +
+          '<b class="chart__val">' + p.pct + '%</b></div>' +
+          '<i class="chart__track"><i class="rank__fill rank__fill--' + claseColor(p.pct) + '" style="width:2%" data-w="' + w + '"></i></i>' +
+        '</div>';
+      }).join("");
+      cardP.innerHTML = '<h2 class="chart__title">🏭 Su efectividad de entrega por proveedor</h2>' + rowsP;
+      cont.appendChild(cardP);
     }
 
     return cont;
@@ -198,11 +323,15 @@
   }
 
   // ---- Render principal -------------------------------------------------
-  function render(datos) {
+  var STATE = { datos: null, seleccion: "__general__" };
+
+  function render() {
     var main = $("#panel");
-    if (!main) return;
+    if (!main || !STATE.datos) return;
     main.innerHTML = "";
-    var v = vistaGeneral(datos);
+    var v = STATE.seleccion === "__general__"
+      ? vistaGeneral(STATE.datos)
+      : vistaFletero(STATE.datos, STATE.seleccion);
     main.appendChild(v);
 
     activarReveal(main);
@@ -212,6 +341,46 @@
         setTimeout(function () { f.style.width = (f.getAttribute("data-w") || 2) + "%"; }, 120 + i * 40);
       });
     }, 120);
+
+    // click en filas del ranking → detalle del fletero
+    Array.prototype.forEach.call(main.querySelectorAll(".rank__row[data-fletero]"), function (row) {
+      row.addEventListener("click", function () {
+        var n = row.getAttribute("data-fletero");
+        seleccionar(n);
+        var sel = $("#selector"); if (sel) sel.value = n;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+  }
+
+  function seleccionar(nombre) {
+    STATE.seleccion = nombre;
+    try { localStorage.setItem("lpe_fletero", nombre); } catch (e) {}
+    render();
+  }
+
+  function poblarSelector() {
+    var sel = $("#selector");
+    if (!sel) return;
+    sel.innerHTML = "";
+    var opt0 = el("option", null, "📊 Resumen general");
+    opt0.value = "__general__";
+    sel.appendChild(opt0);
+    var m = resumenMes(STATE.datos);
+    Object.keys(m.porFletero).sort().forEach(function (n) {
+      var o = el("option", null, n);
+      o.value = n;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () { seleccionar(sel.value); });
+
+    // Recordar selección previa (útil para el celular de cada fletero)
+    var prev = null;
+    try { prev = localStorage.getItem("lpe_fletero"); } catch (e) {}
+    if (prev && (prev === "__general__" || m.porFletero[prev])) {
+      STATE.seleccion = prev;
+      sel.value = prev;
+    }
   }
 
   function ultimaActualizacion(registros) {
@@ -223,9 +392,19 @@
 
   function cargar() {
     var d = window.__LPE_DATA__ || {};
-    var datos = { registros: d.registros || [], empresas: d.empresas || [], clientes: d.clientes || null };
-    ultimaActualizacion(datos.registros);
-    render(datos);
+    STATE.datos = {
+      registros: d.registros || [],
+      empresas: d.empresas || [],
+      clientes: d.clientes || null,
+      motivos: d.motivos || [],
+      motivosPorFletero: d.motivosPorFletero || {},
+      estadisticasFletero: d.estadisticasFletero || {},
+      vendedoresTop: d.vendedoresTop || [],
+      proveedoresPorFletero: d.proveedoresPorFletero || {}
+    };
+    ultimaActualizacion(STATE.datos.registros);
+    poblarSelector();
+    render();
   }
 
   // ---- Splash + arranque ------------------------------------------------
