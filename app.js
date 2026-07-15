@@ -149,12 +149,18 @@
     cont.appendChild(grid);
     cont._rings = rings;
 
-    // Tarjetas de totales del mes
+    // Tarjetas de totales del mes. Boletas entregadas: solo se restan las boletas
+    // rechazadas COMPLETAS (un producto suelto devuelto no voltea la boleta).
     var nombres = Object.keys(m.porFletero);
     var cli = datos.clientes || null;
+    var bol = datos.boletasCsv || null;
     var celdas =
-      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(m.totRep) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(m.totE) + ' / ' + fmtNum(m.totB) + '</b></div>';
+      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(m.totRep) + '</b></div>';
+    if (bol && bol.sac > 0) {
+      celdas += '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(bol.sac - bol.rech) + ' / ' + fmtNum(bol.sac) + '</b></div>';
+    } else {
+      celdas += '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(m.totE) + ' / ' + fmtNum(m.totB) + '</b></div>';
+    }
     if (cli && cli.sac > 0) {
       celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(cli.ent) + ' / ' + fmtNum(cli.sac) + '</b></div>';
     }
@@ -260,11 +266,17 @@
     cont.appendChild(grid);
     cont._rings = [aE.wrap];
 
-    // Sus números del mes
+    // Sus números del mes. Boletas entregadas: solo se restan las rechazadas
+    // COMPLETAS, así coincide con su tabla de motivos.
     var st = (datos.estadisticasFletero || {})[nombre];
     var celdas =
-      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(f.repartos) + '</b></div>' +
-      '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(f.entregadas) + ' / ' + fmtNum(f.boletas) + '</b></div>';
+      '<div class="avg"><span class="avg__k">Repartos de ' + m.mesNombre + '</span><b>' + fmtNum(f.repartos) + '</b></div>';
+    if (st && st.compSac > 0) {
+      celdas += '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(st.compEnt) + ' / ' + fmtNum(st.compSac) + '</b></div>' +
+        '<div class="avg"><span class="avg__k">Boletas rechazadas completas</span><b class="rojo">' + fmtNum(st.compRech) + '</b></div>';
+    } else {
+      celdas += '<div class="avg"><span class="avg__k">Boletas entregadas</span><b>' + fmtNum(f.entregadas) + ' / ' + fmtNum(f.boletas) + '</b></div>';
+    }
     if (st && st.cliSac > 0) {
       celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(st.cliEnt) + ' / ' + fmtNum(st.cliSac) + '</b></div>' +
         '<div class="avg"><span class="avg__k">Clientes no entregados</span><b class="rojo">' + fmtNum(st.recTot) + '</b></div>';
@@ -396,6 +408,7 @@
       registros: d.registros || [],
       empresas: d.empresas || [],
       clientes: d.clientes || null,
+      boletasCsv: d.boletasCsv || null,
       motivos: d.motivos || [],
       motivosPorFletero: d.motivosPorFletero || {},
       estadisticasFletero: d.estadisticasFletero || {},
