@@ -103,10 +103,73 @@ b { font-weight: 700; }
 }
 .hero__update .dot { width: 8px; height: 8px; border-radius: 50%; background: #6ee7a0; box-shadow: 0 0 0 4px rgba(110,231,160,.25); }
 
+/* ---------- Controles ---------- */
+.controls {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(35,43,51,.9); backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  padding: 12px 20px;
+}
+.controls__in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.controls label { font-size: 13px; font-weight: 700; color: #B8C4CE; }
+.select-wrap { position: relative; flex: 1; min-width: 200px; max-width: 380px; }
+.select-wrap::after {
+  content: "▾"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; color: var(--steel); font-size: 13px;
+}
+#selector {
+  width: 100%; appearance: none; -webkit-appearance: none;
+  font-family: var(--font); font-size: 15px; font-weight: 600; color: var(--ink);
+  padding: 12px 38px 12px 14px; border: 1.5px solid var(--line);
+  border-radius: var(--r-sm); background: var(--paper); box-shadow: var(--sh); cursor: pointer;
+}
+#selector:focus { outline: none; border-color: var(--steel); box-shadow: 0 0 0 3px rgba(58,107,140,.25); }
+
 /* ---------- Panel ---------- */
 main { max-width: 1080px; margin: 0 auto; padding: 22px 20px 60px; }
 .view { display: block; }
 .muted { color: var(--ink-2); }
+
+/* Persona (detalle del fletero) */
+.person { margin-bottom: 20px; }
+.person__id { display: flex; align-items: center; gap: 14px; }
+.person__avatar {
+  width: 52px; height: 52px; border-radius: 14px; flex: none;
+  display: grid; place-items: center; font-weight: 800; font-size: 22px; color: #fff;
+  background: linear-gradient(135deg, var(--navy), var(--steel));
+  box-shadow: var(--sh);
+}
+.person__name { font-size: 24px; font-weight: 800; color: #F0EFE8; }
+.person__meta { font-size: 13px; color: rgba(240,239,232,.6); margin-top: 2px; }
+
+/* Botón volver */
+.volver {
+  border: 1px solid var(--line); background: var(--paper); border-radius: 10px;
+  padding: 9px 16px; font-family: var(--font); font-size: 14px; font-weight: 700;
+  color: var(--ink); cursor: pointer; margin-bottom: 16px; box-shadow: var(--sh);
+}
+.volver:hover { background: #FAF7F0; }
+
+/* Tarjetas gráficas de barras horizontales */
+.charts { display: grid; gap: 16px; margin: 6px 0 26px; }
+@media (min-width: 940px) { .charts { grid-template-columns: 1fr 1fr; } }
+.chart {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--sh); padding: 18px 18px 14px;
+}
+.view > .chart { margin-top: 18px; }
+.chart__title { font-size: 16px; font-weight: 800; margin-bottom: 14px; }
+.chart__row { margin-bottom: 12px; }
+.chart__row:last-child { margin-bottom: 4px; }
+.chart__top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.chart__label { font-size: 13.5px; font-weight: 600; color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chart__val { font-size: 14px; font-weight: 800; color: var(--ink); flex: none; }
+.chart__cnt { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.chart__track {
+  display: block; height: 12px; border-radius: 6px; background: #F0EBDF; overflow: hidden;
+}
+.chart__track .rank__fill { display: block; height: 100%; border-radius: 6px; transition: width .7s cubic-bezier(.2,.7,.3,1); }
+.avg b.rojo { color: #C2452F; }
 
 /* Anillos / métricas: general arriba (ancho completo en móvil), empresas abajo */
 .metrics {
@@ -182,9 +245,11 @@ main { max-width: 1080px; margin: 0 auto; padding: 22px 20px 60px; }
 .rank__num { text-align: right; }
 .rank__row {
   width: 100%; border: none; border-bottom: 1px solid var(--line);
-  background: transparent; font-family: var(--font); text-align: left;
+  background: transparent; font-family: var(--font); text-align: left; cursor: pointer;
+  transition: background .15s ease;
 }
 .rank__row:last-child { border-bottom: none; }
+.rank__row:hover { background: #FAF7F0; }
 .rank__pos { font-size: 15px; font-weight: 800; color: var(--ink-2); }
 .rank__name { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .rank__name b { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
