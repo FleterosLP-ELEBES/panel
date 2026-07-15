@@ -1,5 +1,5 @@
 /* GENERADO AUTOMATICAMENTE por robot-actualizar-web.ps1 - NO EDITAR A MANO
-   Ultima actualizacion: 2026-07-15 09:54 */
+   Ultima actualizacion: 2026-07-15 10:05 */
 window.__LPE_DATA__ = { registros: [
  {"fecha":"2026-07-01","fletero":"Diego Zacarias","repartos":1,"boletas":19,"entregadas":17}
 ,{"fecha":"2026-07-01","fletero":"Emiliano Juan Amarilla","repartos":1,"boletas":36,"entregadas":35}
