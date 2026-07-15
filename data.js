@@ -1,5 +1,5 @@
 /* GENERADO AUTOMATICAMENTE por robot-actualizar-web.ps1 - NO EDITAR A MANO
-   Ultima actualizacion: 2026-07-15 10:05 */
+   Ultima actualizacion: 2026-07-15 10:15 */
 window.__LPE_DATA__ = { registros: [
  {"fecha":"2026-07-01","fletero":"Diego Zacarias","repartos":1,"boletas":19,"entregadas":17}
 ,{"fecha":"2026-07-01","fletero":"Emiliano Juan Amarilla","repartos":1,"boletas":36,"entregadas":35}
@@ -113,3 +113,4 @@ window.__LPE_DATA__ = { registros: [
 ,{"fecha":"2026-07-15","fletero":"Walter Tenore","repartos":1,"boletas":19,"entregadas":19}
 ] };
 window.__LPE_DATA__.empresas = [{"id":"lagopuelo","nombre":"Lago Puelo S.A.","logo":"assets/img/logo-lagopuelo.jpg","boletas":1446,"rechazadas":194},{"id":"elebes","nombre":"Elebes S.A.","logo":"assets/img/logo-elebes.jpg","boletas":1865,"rechazadas":186}];
+window.__LPE_DATA__.clientes = {"sac":2048,"ent":1918};
