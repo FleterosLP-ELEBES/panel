@@ -39,6 +39,7 @@
   function fmtNum(n) {
     return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   }
+  function fmtPlata(n) { return "$" + fmtNum(n); }
   function esc(s) { return String(s).replace(/"/g, "&quot;"); }
 
   // ---- Componentes visuales --------------------------------------------
@@ -172,6 +173,17 @@
     proms.innerHTML = celdas;
     cont.appendChild(proms);
 
+    // Fila de rechazo en plata: general + una por empresa
+    var rp = datos.rechazoPlata || null;
+    if (rp && rp.general > 0) {
+      var plata = el("div", "avgs reveal");
+      plata.innerHTML =
+        '<div class="avg"><span class="avg__k">Rechazo de ' + m.mesNombre + ' · las dos empresas</span><b class="rojo">' + fmtPlata(rp.general) + '</b></div>' +
+        '<div class="avg"><span class="avg__k">Rechazo Lago Puelo</span><b class="rojo">' + fmtPlata(rp.lagopuelo) + '</b></div>' +
+        '<div class="avg"><span class="avg__k">Rechazo Elebes</span><b class="rojo">' + fmtPlata(rp.elebes) + '</b></div>';
+      cont.appendChild(plata);
+    }
+
     // Tarjetas gráficas: motivos, fleteros con más clientes no entregados, vendedores
     var topMotivos = (datos.motivos || []).slice(0, 5).map(function (x) {
       return { etiqueta: x.motivo, cantidad: x.cantidad };
@@ -290,6 +302,9 @@
         '<div class="avg"><span class="avg__k">Clientes no entregados</span><b class="rojo">' + fmtNum(st.recTot) + '</b></div>';
     }
     celdas += '<div class="avg"><span class="avg__k">Items rechazados <small>(productos)</small></span><b class="rojo">' + fmtNum(f.itemsRech) + '</b></div>';
+    if (st && st.rechImp > 0) {
+      celdas += '<div class="avg"><span class="avg__k">Rechazo de ' + m.mesNombre + ' en plata</span><b class="rojo">' + fmtPlata(st.rechImp) + '</b></div>';
+    }
     var proms = el("div", "avgs reveal");
     proms.innerHTML = celdas;
     cont.appendChild(proms);
@@ -426,6 +441,8 @@
       registros: d.registros || [],
       empresas: d.empresas || [],
       clientes: d.clientes || null,
+      boletasCsv: d.boletasCsv || null,
+      rechazoPlata: d.rechazoPlata || null,
       boletasCsv: d.boletasCsv || null,
       motivos: d.motivos || [],
       motivosPorFletero: d.motivosPorFletero || {},
