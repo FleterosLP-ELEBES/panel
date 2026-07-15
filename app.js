@@ -92,16 +92,18 @@
   }
 
   // Tarjeta gráfica de barras horizontales (una serie de cantidades).
-  function graficoBarras(titulo, items, unidad, colorClase) {
+  // sufijo: texto pegado al valor (por ej. "%").
+  function graficoBarras(titulo, items, unidad, colorClase, sufijo) {
     if (!items || !items.length) return null;
+    sufijo = sufijo || "";
     var max = items[0].cantidad || 1;
     items.forEach(function (it) { if (it.cantidad > max) max = it.cantidad; });
     var card = el("div", "chart reveal");
     var rows = items.map(function (it) {
       var w = Math.max(4, Math.round(100 * it.cantidad / max));
-      return '<div class="chart__row" title="' + esc(it.etiqueta) + ' · ' + it.cantidad + ' ' + unidad + '">' +
+      return '<div class="chart__row" title="' + esc(it.etiqueta) + ' · ' + it.cantidad + sufijo + ' ' + unidad + '">' +
         '<div class="chart__top"><span class="chart__label">' + it.etiqueta + '</span>' +
-        '<b class="chart__val">' + it.cantidad + '</b></div>' +
+        '<b class="chart__val">' + it.cantidad + sufijo + '</b></div>' +
         '<i class="chart__track"><i class="rank__fill rank__fill--' + (colorClase || "low") + '" style="width:2%" data-w="' + w + '"></i></i>' +
       '</div>';
     }).join("");
@@ -182,15 +184,20 @@
     var topVend = (datos.vendedoresTop || []).slice(0, 5).map(function (x) {
       return { etiqueta: x.nombre, cantidad: x.cantidad };
     });
+    var topProv = (datos.proveedoresTop || []).slice(0, 5).map(function (x) {
+      return { etiqueta: x.nombre, cantidad: x.pct };
+    });
 
     var g1 = graficoBarras("📋 Motivos de rechazo más comunes", topMotivos, "rechazos");
-    var g2 = graficoBarras("🚫 Fleteros con más clientes no entregados · " + m.mesNombre, topFleteros, "clientes");
+    var g2 = graficoBarras("⚠️ Rechazos totales de cliente · " + m.mesNombre, topFleteros, "clientes");
     var g3 = graficoBarras("🧑‍💼 Vendedores con más boletas rechazadas · " + m.mesNombre, topVend, "boletas");
-    if (g1 || g2 || g3) {
+    var g4 = graficoBarras("🏭 Proveedores con más rechazos · " + m.mesNombre + " <span class='chart__cnt'>(% de lo facturado en plata)</span>", topProv, "de rechazo", null, "%");
+    if (g1 || g2 || g3 || g4) {
       var fila = el("div", "charts");
       if (g1) fila.appendChild(g1);
       if (g2) fila.appendChild(g2);
       if (g3) fila.appendChild(g3);
+      if (g4) fila.appendChild(g4);
       cont.appendChild(fila);
     }
 
@@ -413,6 +420,7 @@
       motivosPorFletero: d.motivosPorFletero || {},
       estadisticasFletero: d.estadisticasFletero || {},
       vendedoresTop: d.vendedoresTop || [],
+      proveedoresTop: d.proveedoresTop || [],
       proveedoresPorFletero: d.proveedoresPorFletero || {}
     };
     ultimaActualizacion(STATE.datos.registros);
