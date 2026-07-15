@@ -125,8 +125,9 @@
     delMes.forEach(function (r) {
       totB += r.boletas; totE += r.entregadas; totRep += r.repartos;
       var f = porFletero[r.fletero];
-      if (!f) f = porFletero[r.fletero] = { nombre: r.fletero, repartos: 0, boletas: 0, entregadas: 0, ultima: "" };
+      if (!f) f = porFletero[r.fletero] = { nombre: r.fletero, repartos: 0, boletas: 0, entregadas: 0, itemsRech: 0, ultima: "" };
       f.repartos += r.repartos; f.boletas += r.boletas; f.entregadas += r.entregadas;
+      f.itemsRech += (r.itemsRech || 0);
       if (r.fecha > f.ultima) f.ultima = r.fecha;
     });
     return { mesNombre: mesNombre, porFletero: porFletero, totB: totB, totE: totE, totRep: totRep };
@@ -191,7 +192,7 @@
     var g1 = graficoBarras("📋 Motivos de rechazo más comunes", topMotivos, "rechazos");
     var g2 = graficoBarras("⚠️ Rechazos totales de cliente · " + m.mesNombre, topFleteros, "clientes");
     var g3 = graficoBarras("🧑‍💼 Vendedores con más boletas rechazadas · " + m.mesNombre, topVend, "boletas");
-    var g4 = graficoBarras("🏭 Proveedores con más rechazos · " + m.mesNombre + " <span class='chart__cnt'>(% de lo facturado en plata)</span>", topProv, "de rechazo", null, "%");
+    var g4 = graficoBarras("🏭 Proveedores con más rechazos · " + m.mesNombre, topProv, "de rechazo", null, "%");
     if (g1 || g2 || g3 || g4) {
       var fila = el("div", "charts");
       if (g1) fila.appendChild(g1);
@@ -288,18 +289,28 @@
       celdas += '<div class="avg"><span class="avg__k">Clientes entregados</span><b>' + fmtNum(st.cliEnt) + ' / ' + fmtNum(st.cliSac) + '</b></div>' +
         '<div class="avg"><span class="avg__k">Clientes no entregados</span><b class="rojo">' + fmtNum(st.recTot) + '</b></div>';
     }
+    celdas += '<div class="avg"><span class="avg__k">Items rechazados <small>(productos)</small></span><b class="rojo">' + fmtNum(f.itemsRech) + '</b></div>';
     var proms = el("div", "avgs reveal");
     proms.innerHTML = celdas;
     cont.appendChild(proms);
 
-    // Motivos de sus boletas rechazadas (solo boletas completas)
+    // Motivos de sus boletas rechazadas (solo boletas completas), medidos en %
     var mios = (datos.motivosPorFletero || {})[nombre] || [];
     if (mios.length) {
-      var total = 0;
-      mios.forEach(function (x) { total += x.cantidad; });
-      var card = graficoBarras("📋 Motivos de sus boletas rechazadas · " + total + " en total",
-        mios.map(function (x) { return { etiqueta: x.motivo, cantidad: x.cantidad }; }), "rechazos");
-      if (card) cont.appendChild(card);
+      var total = 0, maxM = 0;
+      mios.forEach(function (x) { total += x.cantidad; if (x.cantidad > maxM) maxM = x.cantidad; });
+      var card = el("div", "chart reveal");
+      var rowsM = mios.map(function (x) {
+        var p = Math.round(100 * x.cantidad / (total || 1));
+        var w = Math.max(4, Math.round(100 * x.cantidad / (maxM || 1)));
+        return '<div class="chart__row" title="' + esc(x.motivo) + ' · ' + x.cantidad + ' de ' + total + ' (' + p + '%)">' +
+          '<div class="chart__top"><span class="chart__label">' + x.motivo + '</span>' +
+          '<b class="chart__val">' + p + '% <span class="chart__cnt">(' + x.cantidad + ')</span></b></div>' +
+          '<i class="chart__track"><i class="rank__fill rank__fill--low" style="width:2%" data-w="' + w + '"></i></i>' +
+        '</div>';
+      }).join("");
+      card.innerHTML = '<h2 class="chart__title">📋 Motivos de sus boletas rechazadas · ' + total + ' en total</h2>' + rowsM;
+      cont.appendChild(card);
     }
 
     // Su entrega por proveedor (% en plata)
