@@ -305,7 +305,7 @@
         var w = Math.max(4, Math.round(100 * x.cantidad / (maxM || 1)));
         return '<div class="chart__row" title="' + esc(x.motivo) + ' · ' + x.cantidad + ' de ' + total + ' (' + p + '%)">' +
           '<div class="chart__top"><span class="chart__label">' + x.motivo + '</span>' +
-          '<b class="chart__val">' + p + '% <span class="chart__cnt">(' + x.cantidad + ')</span></b></div>' +
+          '<b class="chart__val">' + p + '%</b></div>' +
           '<i class="chart__track"><i class="rank__fill rank__fill--low" style="width:2%" data-w="' + w + '"></i></i>' +
         '</div>';
       }).join("");
