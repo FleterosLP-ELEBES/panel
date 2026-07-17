@@ -1,5 +1,5 @@
 /* GENERADO AUTOMATICAMENTE por robot-actualizar-web.ps1 - NO EDITAR A MANO
-   Ultima actualizacion: 2026-07-16 14:12 */
+   Ultima actualizacion: 2026-07-17 14:10 */
 window.__LPE_DATA__ = { registros: [
  {"fecha":"2026-07-01","fletero":"Diego Zacarias","repartos":1,"boletas":19,"entregadas":17,"itemsRech":13}
 ,{"fecha":"2026-07-01","fletero":"Emiliano Juan Amarilla","repartos":1,"boletas":36,"entregadas":35,"itemsRech":6}
@@ -122,6 +122,10 @@ window.__LPE_DATA__ = { registros: [
 ,{"fecha":"2026-07-16","fletero":"Miguel Angel Pallini","repartos":1,"boletas":14,"entregadas":14,"itemsRech":0}
 ,{"fecha":"2026-07-16","fletero":"Simon Olivera","repartos":1,"boletas":26,"entregadas":26,"itemsRech":0}
 ,{"fecha":"2026-07-16","fletero":"Walter Tenore","repartos":1,"boletas":11,"entregadas":11,"itemsRech":0}
+,{"fecha":"2026-07-17","fletero":"Emiliano Juan Amarilla","repartos":1,"boletas":31,"entregadas":31,"itemsRech":0}
+,{"fecha":"2026-07-17","fletero":"Marcos Sanchez","repartos":1,"boletas":86,"entregadas":86,"itemsRech":0}
+,{"fecha":"2026-07-17","fletero":"Miguel Angel Pallini","repartos":1,"boletas":25,"entregadas":25,"itemsRech":0}
+,{"fecha":"2026-07-17","fletero":"Walter Tenore","repartos":1,"boletas":33,"entregadas":33,"itemsRech":0}
 ] };
 window.__LPE_DATA__.empresas = [{"id":"lagopuelo","nombre":"Lago Puelo S.A.","logo":"assets/img/logo-lagopuelo.jpg","boletas":1591,"rechazadas":225},{"id":"elebes","nombre":"Elebes S.A.","logo":"assets/img/logo-elebes.jpg","boletas":1966,"rechazadas":193}];
 window.__LPE_DATA__.clientes = {"sac":2197,"ent":2053};
