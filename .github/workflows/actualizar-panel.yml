@@ -1,0 +1,41 @@
+name: Actualizar panel de fleteros
+
+on:
+  schedule:
+    - cron: "10 17 * * *"   # 14:10 hora argentina (AR no tiene horario de verano)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hora argentina
+        shell: powershell
+        run: tzutil /s "Argentina Standard Time"
+
+      - name: Correr robot (API Gescom)
+        shell: powershell
+        env:
+          GESCOM_REALM: ${{ secrets.GESCOM_REALM }}
+          GESCOM_USUARIO: ${{ secrets.GESCOM_USUARIO }}
+          GESCOM_CLAVE: ${{ secrets.GESCOM_CLAVE }}
+        run: powershell -NoProfile -File robot-nube.ps1
+
+      - name: Publicar cambios
+        shell: powershell
+        run: |
+          git config user.name "robot-lpe"
+          git config user.email "robot-lpe@users.noreply.github.com"
+          git add data.js historial-meses.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git commit -m ("Datos del " + (Get-Date -Format "dd/MM/yyyy HH:mm"))
+            git push
+          } else {
+            Write-Output "Sin cambios: no hace falta publicar"
+          }
