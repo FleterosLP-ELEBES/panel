@@ -1,17 +1,17 @@
 {
     "2026-07":  {
-                    "entregadas":  4583,
+                    "entregadas":  4580,
                     "actualizado":  "2026-07-21",
                     "repartos":  160,
-                    "boletas":  5083,
+                    "boletas":  5080,
                     "empresas":  {
                                      "elebes":  {
                                                     "rechazadas":  219,
-                                                    "boletas":  2451
+                                                    "boletas":  2472
                                                 },
                                      "lagopuelo":  {
                                                        "rechazadas":  278,
-                                                       "boletas":  2196
+                                                       "boletas":  2220
                                                    }
                                  }
                 }
