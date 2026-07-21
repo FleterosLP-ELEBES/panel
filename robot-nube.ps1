@@ -28,7 +28,9 @@ $EMPRESAS = @(
 )
 
 function Log($msg) {
-  Write-Output ((Get-Date -Format "yyyy-MM-dd HH:mm:ss") + "  " + $msg)
+  # OJO: [Console] y no Write-Output — dentro de una funcion, Write-Output se
+  # mezcla con el valor de retorno y contamina los datos (bug ya sufrido).
+  [Console]::Out.WriteLine((Get-Date -Format "yyyy-MM-dd HH:mm:ss") + "  " + $msg)
 }
 Log "================ INICIO (NUBE) ================"
 
