@@ -2,7 +2,8 @@ name: Actualizar panel de fleteros
 
 on:
   schedule:
-    - cron: "10 17 * * *"   # 14:10 hora argentina (AR no tiene horario de verano)
+    - cron: "8 10 * * 1-5"   # 07:08 hora argentina, lunes a viernes (AR no tiene horario de verano)
+    - cron: "8 17 * * 1-5"   # 14:08 hora argentina, lunes a viernes
   workflow_dispatch: {}
 
 permissions:
