@@ -2,8 +2,15 @@ name: Actualizar panel de fleteros
 
 on:
   schedule:
-    - cron: "8 10 * * 1-5"   # 07:08 hora argentina, lunes a viernes (AR no tiene horario de verano)
-    - cron: "8 17 * * 1-5"   # 14:08 hora argentina, lunes a viernes
+    # Hora argentina (UTC-3, sin horario de verano). 3 intentos por turno porque
+    # los cron gratis de GitHub a veces llegan tarde o no disparan; el robot solo
+    # baja de verdad una vez al dia (skip inteligente), asi los reintentos saltan.
+    - cron: "8 10 * * 1-5"    # 07:08 ART (manana)
+    - cron: "38 10 * * 1-5"   # 07:38 ART
+    - cron: "8 11 * * 1-5"    # 08:08 ART
+    - cron: "8 17 * * 1-5"    # 14:08 ART (tarde, red de seguridad)
+    - cron: "38 17 * * 1-5"   # 14:38 ART
+    - cron: "8 18 * * 1-5"    # 15:08 ART
   workflow_dispatch: {}
 
 permissions:
