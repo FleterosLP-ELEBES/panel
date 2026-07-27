@@ -34,6 +34,24 @@ function Log($msg) {
 }
 Log "================ INICIO (NUBE) ================"
 
+# --- Bajada inteligente: una sola por dia -----------------------------------
+# En corridas automaticas (schedule), si el data.js del repo ya tiene la fecha
+# de HOY, salimos sin pegarle a Gescom. Asi los reintentos del turno saltan en
+# 1s y la tarde solo baja si fallo la manana entera. Las corridas MANUALES
+# (workflow_dispatch) NUNCA saltan, para poder forzar.
+if ($EN_NUBE -and $env:GITHUB_EVENT_NAME -eq "schedule") {
+  $dataJsRepo = Join-Path $CARPETA_PROYECTO "data.js"
+  if (Test-Path $dataJsRepo) {
+    $cab = (Get-Content $dataJsRepo -TotalCount 3 -Encoding UTF8) -join " "
+    $hoyStr = (Get-Date -Format "yyyy-MM-dd")
+    if ($cab -match ("Ultima actualizacion: " + [regex]::Escape($hoyStr))) {
+      Log "Datos de hoy ($hoyStr) ya publicados: no hace falta bajar de nuevo"
+      Log "================ FIN (NUBE) ================"
+      exit 0
+    }
+  }
+}
+
 # --- Credenciales -----------------------------------------------------------
 # Secretos de Actions (con Trim: un \r\n colado rompe el login de Keycloak)
 $credU = ""; $credC = ""; $credR = ""
