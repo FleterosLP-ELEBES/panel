@@ -324,6 +324,16 @@ main { max-width: 1080px; margin: 0 auto; padding: 22px 20px 60px; }
 .cierre__dato span { font-size: 12px; opacity: .88; font-weight: 600; }
 .cierre__dato b { font-size: 14.5px; font-weight: 800; }
 @media (min-width: 720px) { .cierre__grid { grid-template-columns: repeat(4, 1fr); } }
+.cierre__ver {
+  display: block; width: 100%; margin-top: 14px; padding: 12px;
+  border: none; border-radius: var(--r-sm); cursor: pointer;
+  background: rgba(255,255,255,.92); color: #1B2430;
+  font-family: var(--font); font-size: 14px; font-weight: 800; letter-spacing: .01em;
+  transition: transform .12s ease, background .15s ease;
+}
+.cierre__ver:hover { background: #fff; transform: translateY(-1px); }
+.rank__row--static { cursor: default; }
+.rank__row--static:hover { background: transparent; }
 
 /* ---------- Fondo oscuro con patrón de reparto (SIEMPRE al final del archivo) ---------- */
 body {
