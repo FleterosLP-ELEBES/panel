@@ -429,6 +429,52 @@ $jFleProv = @(foreach ($cho3 in ($porCho3.Keys | Sort-Object)) {
 })
 [void]$sb.AppendLine("window.__LPE_DATA__.proveedoresPorFletero = {" + ($jFleProv -join ",") + "};")
 
+# --- Resumen del MES ANTERIOR (para la tarjeta de cierre de mes) -------------
+# Totales del mes en curso (se reusan tambien en el historial de la seccion 7)
+$mB = 0; $mE = 0; $mR = 0
+foreach ($clave in $claves) { $ee = $entregas[$clave]; $mB += $ee.asig; $mE += $ee.real; $mR += $ee.reps.Count }
+$nFleteros = @($claves | ForEach-Object { $_.Split("|")[1] } | Sort-Object -Unique).Count
+$hist = @{}
+if (Test-Path $HIST_FILE) {
+  try {
+    $viejo = Get-Content $HIST_FILE -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($ph in $viejo.PSObject.Properties) { $hist[$ph.Name] = $ph.Value }
+  } catch { Log "AVISO: no pude leer historial-meses.json, se regenera" }
+}
+$mesAntKey = ([DateTime]($mesActual + "-01")).AddMonths(-1).ToString("yyyy-MM")
+$ma = $hist[$mesAntKey]
+if ($ma) {
+  $maEf = 0
+  if ($null -ne $ma.efGeneral) { $maEf = $ma.efGeneral }
+  elseif ($null -ne $ma.boletas -and [double]$ma.boletas -gt 0) { $maEf = [math]::Round(100.0 * $ma.entregadas / $ma.boletas, 1) }
+  $maEmp = @()
+  foreach ($emx in $EMPRESAS) {
+    $me = $null; if ($null -ne $ma.empresas) { $me = $ma.empresas.($emx.id) }
+    $efE = 0
+    if ($null -ne $me) {
+      if ($null -ne $me.ef) { $efE = $me.ef }
+      elseif ($null -ne $me.boletas -and [double]$me.boletas -gt 0) { $efE = [math]::Round(100.0 * ($me.boletas - $me.rechazadas) / $me.boletas, 1) }
+    }
+    $maEmp += '{"nombre":"' + $emx.nombre + '","ef":' + (([string]$efE) -replace ",", ".") + '}'
+  }
+  $maBSac = 0; if ($null -ne $ma.boletasSac) { $maBSac = [int]$ma.boletasSac }
+  $maBRech = 0; if ($null -ne $ma.boletasRech) { $maBRech = [int]$ma.boletasRech }
+  $maCSac = 0; if ($null -ne $ma.clientesSac) { $maCSac = [int]$ma.clientesSac }
+  $maCEnt = 0; if ($null -ne $ma.clientesEnt) { $maCEnt = [int]$ma.clientesEnt }
+  $maPlata = 0; if ($null -ne $ma.plataRech) { $maPlata = [long]$ma.plataRech }
+  $maReps = 0; if ($null -ne $ma.repartos) { $maReps = [int]$ma.repartos }
+  $maFlet = 0; if ($null -ne $ma.fleteros) { $maFlet = [int]$ma.fleteros }
+  $maMes = [int]$mesAntKey.Substring(5, 2)
+  $maAnio = [int]$mesAntKey.Substring(0, 4)
+  $maJson = '{"clave":"' + $mesAntKey + '","anio":' + $maAnio + ',"mes":' + $maMes +
+    ',"efGeneral":' + (([string]$maEf) -replace ",", ".") +
+    ',"empresas":[' + ($maEmp -join ",") + ']' +
+    ',"repartos":' + $maReps + ',"boletasEnt":' + ($maBSac - $maBRech) + ',"boletasSac":' + $maBSac +
+    ',"clientesEnt":' + $maCEnt + ',"clientesSac":' + $maCSac +
+    ',"plataRech":' + $maPlata + ',"fleteros":' + $maFlet + '}'
+  [void]$sb.AppendLine("window.__LPE_DATA__.mesAnterior = " + $maJson + ";")
+}
+
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 if (-not $EN_NUBE) {
   $salidaPrueba = Join-Path $CARPETA_PROYECTO "robot\data-nube-prueba.js"
@@ -441,24 +487,19 @@ if (-not $EN_NUBE) {
 Log "data.js generado"
 
 # --- 7) Historial mensual (lo commitea el workflow) --------------------------
-$hist = @{}
-if (Test-Path $HIST_FILE) {
-  try {
-    $viejo = Get-Content $HIST_FILE -Raw -Encoding UTF8 | ConvertFrom-Json
-    foreach ($ph in $viejo.PSObject.Properties) { $hist[$ph.Name] = $ph.Value }
-  } catch { Log "AVISO: no pude leer historial-meses.json, se regenera" }
-}
-$mB = 0; $mE = 0; $mR = 0
-foreach ($clave in $claves) {
-  $ee = $entregas[$clave]
-  $mB += $ee.asig; $mE += $ee.real; $mR += $ee.reps.Count
-}
+# $hist, $mB, $mE, $mR y $nFleteros ya se calcularon en la seccion de mesAnterior.
+$efGen = 0.0; if ($mB -gt 0) { $efGen = [math]::Round(100.0 * $mE / $mB, 1) }
 $hEmp = @{}
 foreach ($emx in $EMPRESAS) {
-  $hEmp[$emx.id] = @{ boletas = $empStats[$emx.id].ventas.Count; rechazadas = $empStats[$emx.id].rech.Count }
+  $vC = $empStats[$emx.id].ventas.Count; $rC = $empStats[$emx.id].rech.Count
+  $efE = 0.0; if ($vC -gt 0) { $efE = [math]::Round(100.0 * ($vC - $rC) / $vC, 1) }
+  $hEmp[$emx.id] = @{ nombre = $emx.nombre; boletas = $vC; rechazadas = $rC; ef = $efE }
 }
 $hist[$mesActual] = @{
-  boletas = $mB; entregadas = $mE; repartos = $mR
+  boletas = $mB; entregadas = $mE; repartos = $mR; efGeneral = $efGen
+  boletasSac = $bolSac; boletasRech = $bolCompTot
+  clientesSac = $cliSac; clientesEnt = $cliEnt
+  plataRech = ($rLP + $rEL); fleteros = $nFleteros
   empresas = $hEmp
   actualizado = (Get-Date -Format "yyyy-MM-dd")
 }
