@@ -475,12 +475,19 @@ if ($ma) {
   $maFlet = 0; if ($null -ne $ma.fleteros) { $maFlet = [int]$ma.fleteros }
   $maMes = [int]$mesAntKey.Substring(5, 2)
   $maAnio = [int]$mesAntKey.Substring(0, 4)
+  $maRank = @()
+  if ($null -ne $ma.ranking) {
+    foreach ($rk in @($ma.ranking)) {
+      $maRank += '{"nombre":"' + (JsonTxt $rk.nombre) + '","repartos":' + ([int]$rk.repartos) + ',"ef":' + (([string]$rk.ef) -replace ",", ".") + '}'
+    }
+  }
   $maJson = '{"clave":"' + $mesAntKey + '","anio":' + $maAnio + ',"mes":' + $maMes +
     ',"efGeneral":' + (([string]$maEf) -replace ",", ".") +
     ',"empresas":[' + ($maEmp -join ",") + ']' +
     ',"repartos":' + $maReps + ',"boletasEnt":' + ($maBSac - $maBRech) + ',"boletasSac":' + $maBSac +
     ',"clientesEnt":' + $maCEnt + ',"clientesSac":' + $maCSac +
-    ',"plataRech":' + $maPlata + ',"fleteros":' + $maFlet + '}'
+    ',"plataRech":' + $maPlata + ',"fleteros":' + $maFlet +
+    ',"ranking":[' + ($maRank -join ",") + ']}'
   [void]$sb.AppendLine("window.__LPE_DATA__.mesAnterior = " + $maJson + ";")
 }
 
@@ -504,12 +511,28 @@ foreach ($emx in $EMPRESAS) {
   $efE = 0.0; if ($vC -gt 0) { $efE = [math]::Round(100.0 * ($vC - $rC) / $vC, 1) }
   $hEmp[$emx.id] = @{ nombre = $emx.nombre; boletas = $vC; rechazadas = $rC; ef = $efE }
 }
+# Ranking por fletero del mes (para el "ver detalles" de la tarjeta de cierre)
+$flMes = @{}
+foreach ($clave in $claves) {
+  $choK = $clave.Split("|")[1]
+  $eeK = $entregas[$clave]
+  if (-not $flMes[$choK]) { $flMes[$choK] = @{ reps = 0; bol = 0; ent = 0 } }
+  $flMes[$choK].reps += $eeK.reps.Count
+  $flMes[$choK].bol += $eeK.asig
+  $flMes[$choK].ent += $eeK.real
+}
+$rankTmp = foreach ($choK in $flMes.Keys) {
+  $fk = $flMes[$choK]
+  $efK = 0.0; if ($fk.bol -gt 0) { $efK = [math]::Round(100.0 * $fk.ent / $fk.bol, 1) }
+  [PSCustomObject]@{ nombre = (NombreMostrar $choK); repartos = $fk.reps; ef = $efK }
+}
+$rankFletero = @($rankTmp | Sort-Object ef -Descending)
 $hist[$mesActual] = @{
   boletas = $mB; entregadas = $mE; repartos = $mR; efGeneral = $efGen
   boletasSac = $bolSac; boletasRech = $bolCompTot
   clientesSac = $cliSac; clientesEnt = $cliEnt
   plataRech = ($rLP + $rEL); fleteros = $nFleteros
-  empresas = $hEmp
+  empresas = $hEmp; ranking = $rankFletero
   actualizado = (Get-Date -Format "yyyy-MM-dd")
 }
 [System.IO.File]::WriteAllText($HIST_FILE, ($hist | ConvertTo-Json -Depth 6), $utf8)
