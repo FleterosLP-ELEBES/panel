@@ -40,6 +40,7 @@
     return String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   }
   function fmtPlata(n) { return "$" + fmtNum(n); }
+  function fmtPct(p) { return (Math.round((p || 0) * 10) / 10).toString().replace(/\.0$/, "") + "%"; }
   function esc(s) { return String(s).replace(/"/g, "&quot;"); }
 
   // ---- Componentes visuales --------------------------------------------
@@ -134,9 +135,48 @@
     return { mesNombre: mesNombre, porFletero: porFletero, totB: totB, totE: totE, totRep: totRep };
   }
 
+  // Tarjeta llamativa de cierre de mes: aparece del día 10 en adelante y muestra
+  // el mes anterior ya cerrado con números finales. Con ?cierre=1 se puede forzar
+  // para previsualizarla cualquier día. Se puede cerrar (vuelve el mes siguiente).
+  function tarjetaCierreMes(datos) {
+    var ma = datos.mesAnterior;
+    if (!ma) return null;
+    var forzar = /[?&]cierre=1/.test(location.search);
+    if (!forzar) {
+      if (new Date().getDate() < 10) return null;
+      try { if (localStorage.getItem("lpe_cierre_" + ma.clave)) return null; } catch (e) {}
+    }
+    var nombreMes = (NOMBRES_MES[(ma.mes || 1) - 1] || "") + " " + (ma.anio || "");
+    function dato(k, v) {
+      return '<div class="cierre__dato"><span>' + k + '</span><b>' + v + '</b></div>';
+    }
+    var empHtml = (ma.empresas || []).map(function (e) {
+      return '<div class="cierre__emp"><span>' + e.nombre + '</span><b>' + fmtPct(e.ef) + '</b></div>';
+    }).join("");
+    var filas = dato("Repartos", fmtNum(ma.repartos)) +
+      dato("Boletas entregadas", fmtNum(ma.boletasEnt) + " / " + fmtNum(ma.boletasSac));
+    if (ma.clientesSac > 0) filas += dato("Clientes entregados", fmtNum(ma.clientesEnt) + " / " + fmtNum(ma.clientesSac));
+    if (ma.plataRech > 0) filas += dato("Rechazo en plata", fmtPlata(ma.plataRech));
+    var card = el("div", "cierre reveal");
+    card.innerHTML =
+      '<button class="cierre__x" aria-label="Cerrar">&times;</button>' +
+      '<div class="cierre__top">🎉 Mirá cómo cerró ' + nombreMes + '</div>' +
+      '<div class="cierre__ef"><span class="cierre__efnum">' + fmtPct(ma.efGeneral) + '</span>' +
+        '<span class="cierre__eflbl">efectividad general del mes<br>' + fmtNum(ma.fleteros) + ' fleteros</span></div>' +
+      (empHtml ? '<div class="cierre__emps">' + empHtml + '</div>' : '') +
+      '<div class="cierre__grid">' + filas + '</div>';
+    card.querySelector(".cierre__x").addEventListener("click", function () {
+      try { localStorage.setItem("lpe_cierre_" + ma.clave, "1"); } catch (e) {}
+      card.parentNode && card.parentNode.removeChild(card);
+    });
+    return card;
+  }
+
   // ---- Vista: resumen general -------------------------------------------
   function vistaGeneral(datos) {
     var cont = el("div", "view");
+    var cierre = tarjetaCierreMes(datos);
+    if (cierre) cont.appendChild(cierre);
     var m = resumenMes(datos);
     var efGeneral = m.totB > 0 ? m.totE / m.totB : null;
 
@@ -449,7 +489,8 @@
       estadisticasFletero: d.estadisticasFletero || {},
       vendedoresTop: d.vendedoresTop || [],
       proveedoresTop: d.proveedoresTop || [],
-      proveedoresPorFletero: d.proveedoresPorFletero || {}
+      proveedoresPorFletero: d.proveedoresPorFletero || {},
+      mesAnterior: d.mesAnterior || null
     };
     ultimaActualizacion(STATE.datos.registros);
     poblarSelector();
