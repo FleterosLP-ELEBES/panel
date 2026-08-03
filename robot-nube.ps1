@@ -39,7 +39,7 @@ Log "================ INICIO (NUBE) ================"
 # de HOY, salimos sin pegarle a Gescom. Asi los reintentos del turno saltan en
 # 1s y la tarde solo baja si fallo la manana entera. Las corridas MANUALES
 # (workflow_dispatch) NUNCA saltan, para poder forzar.
-if ($EN_NUBE -and $env:GITHUB_EVENT_NAME -eq "schedule") {
+if ($EN_NUBE -and $env:GITHUB_EVENT_NAME -eq "schedule" -and -not $env:FORCE_MES) {
   $dataJsRepo = Join-Path $CARPETA_PROYECTO "data.js"
   if (Test-Path $dataJsRepo) {
     $cab = (Get-Content $dataJsRepo -TotalCount 3 -Encoding UTF8) -join " "
@@ -101,13 +101,25 @@ $mesIniDt = Get-Date -Day 1
 $mesIni = $mesIniDt.ToString("yyyy-MM-01")
 $mesActual = $mesIniDt.ToString("yyyy-MM")
 $mesFinExcl = $mesIniDt.AddMonths(1).ToString("yyyy-MM-dd")
-# Escape hatch: FORCE_MES=yyyy-MM recalcula ese mes (para backfill de un mes cerrado).
+# Escape hatch / refresco de cierre: FORCE_MES=yyyy-MM recalcula ese mes.
+# Se usa para el re-chequeo del mes anterior cuando cierran los camiones.
 if ($env:FORCE_MES -match '^\d{4}-\d{2}$') {
   $mesIniDt = [DateTime]($env:FORCE_MES + "-01")
   $mesIni = $mesIniDt.ToString("yyyy-MM-01")
   $mesActual = $mesIniDt.ToString("yyyy-MM")
   $mesFinExcl = $mesIniDt.AddMonths(1).ToString("yyyy-MM-dd")
   Log "FORZADO mes = $mesActual"
+  # Si ese mes ya quedo cerrado definitivo (camiones cerrados), no re-bajar.
+  if (Test-Path $HIST_FILE) {
+    try {
+      $hChk = Get-Content $HIST_FILE -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($hChk.$mesActual -and $hChk.$mesActual.cierreFinal -eq $true) {
+        Log "Mes $mesActual ya cerrado definitivo: no hace falta re-bajar"
+        Log "================ FIN (NUBE) ================"
+        exit 0
+      }
+    } catch { }
+  }
 }
 
 # --- 1) Repartos del mes ----------------------------------------------------
@@ -122,12 +134,14 @@ if ($listaRepartos.Count -eq 0) {
   $listaRepartos = @($repartosRaw)
 }
 $repInfo = @{}
+$repAbiertos = 0   # camiones del mes todavia sin cerrar (rendir)
 foreach ($rpx in $listaRepartos) {
   $fch = ([string]$rpx.fecha).Substring(0, 10)
   if ($fch -gt $hoy) { continue }
+  if ($rpx.cerrado -ne $true) { $repAbiertos++ }
   $repInfo[[string]$rpx.codigo] = @{ fecha = $fch; chofer = (([string]$rpx.nombreChofer).Trim().ToUpper() -replace "\s+", " ") }
 }
-Log ("Repartos del mes ($mesActual): " + $repInfo.Count)
+Log ("Repartos del mes ($mesActual): " + $repInfo.Count + " (sin cerrar: $repAbiertos)")
 if ($repInfo.Count -eq 0) { Log "ERROR: la API no devolvio repartos; NO se publica nada"; exit 1 }
 
 # --- 2) Catalogos -----------------------------------------------------------
@@ -499,8 +513,13 @@ if (-not $EN_NUBE) {
   Log "================ FIN (NUBE) ================"
   exit 0
 }
-[System.IO.File]::WriteAllText((Join-Path $CARPETA_PROYECTO "data.js"), $sb.ToString(), $utf8)
-Log "data.js generado"
+if ($env:FORCE_MES) {
+  # Refresco del mes anterior: solo se toca el historial, NO la web del mes en curso
+  Log "FORCE_MES: solo se refresca el historial, no se reescribe data.js"
+} else {
+  [System.IO.File]::WriteAllText((Join-Path $CARPETA_PROYECTO "data.js"), $sb.ToString(), $utf8)
+  Log "data.js generado"
+}
 
 # --- 7) Historial mensual (lo commitea el workflow) --------------------------
 # $hist, $mB, $mE, $mR y $nFleteros ya se calcularon en la seccion de mesAnterior.
@@ -527,13 +546,21 @@ $rankTmp = foreach ($choK in $flMes.Keys) {
   [PSCustomObject]@{ nombre = (NombreMostrar $choK); repartos = $fk.reps; ef = $efK }
 }
 $rankFletero = @($rankTmp | Sort-Object ef -Descending)
+# Cierre definitivo: solo en un refresco (FORCE_MES) y con TODOS los camiones cerrados.
+$esCierreFinal = $false
+if ($env:FORCE_MES -and $repAbiertos -eq 0) { $esCierreFinal = $true }
 $hist[$mesActual] = @{
   boletas = $mB; entregadas = $mE; repartos = $mR; efGeneral = $efGen
   boletasSac = $bolSac; boletasRech = $bolCompTot
   clientesSac = $cliSac; clientesEnt = $cliEnt
   plataRech = ($rLP + $rEL); fleteros = $nFleteros
   empresas = $hEmp; ranking = $rankFletero
+  cierreFinal = $esCierreFinal
   actualizado = (Get-Date -Format "yyyy-MM-dd")
+}
+if ($env:FORCE_MES) {
+  if ($esCierreFinal) { Log "Mes $mesActual marcado como CIERRE FINAL (todos los camiones cerrados)" }
+  else { Log "Mes $mesActual refrescado (aun $repAbiertos camiones sin cerrar; se reintentara)" }
 }
 [System.IO.File]::WriteAllText($HIST_FILE, ($hist | ConvertTo-Json -Depth 6), $utf8)
 Log "Historial mensual actualizado ($mesActual)"
