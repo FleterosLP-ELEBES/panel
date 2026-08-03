@@ -101,6 +101,14 @@ $mesIniDt = Get-Date -Day 1
 $mesIni = $mesIniDt.ToString("yyyy-MM-01")
 $mesActual = $mesIniDt.ToString("yyyy-MM")
 $mesFinExcl = $mesIniDt.AddMonths(1).ToString("yyyy-MM-dd")
+# Escape hatch: FORCE_MES=yyyy-MM recalcula ese mes (para backfill de un mes cerrado).
+if ($env:FORCE_MES -match '^\d{4}-\d{2}$') {
+  $mesIniDt = [DateTime]($env:FORCE_MES + "-01")
+  $mesIni = $mesIniDt.ToString("yyyy-MM-01")
+  $mesActual = $mesIniDt.ToString("yyyy-MM")
+  $mesFinExcl = $mesIniDt.AddMonths(1).ToString("yyyy-MM-dd")
+  Log "FORZADO mes = $mesActual"
+}
 
 # --- 1) Repartos del mes ----------------------------------------------------
 $repartosRaw = Get-Api "distribucion/api/v1/get-repartos?fechadesde=$mesIni&fechahasta=$mesFinExcl"
@@ -449,11 +457,12 @@ if ($ma) {
   elseif ($null -ne $ma.boletas -and [double]$ma.boletas -gt 0) { $maEf = [math]::Round(100.0 * $ma.entregadas / $ma.boletas, 1) }
   $maEmp = @()
   foreach ($emx in $EMPRESAS) {
-    $me = $null; if ($null -ne $ma.empresas) { $me = $ma.empresas.($emx.id) }
+    # OJO: NO usar $me (PS es case-insensitive y pisaria a $mE = total entregadas)
+    $emH = $null; if ($null -ne $ma.empresas) { $emH = $ma.empresas.($emx.id) }
     $efE = 0
-    if ($null -ne $me) {
-      if ($null -ne $me.ef) { $efE = $me.ef }
-      elseif ($null -ne $me.boletas -and [double]$me.boletas -gt 0) { $efE = [math]::Round(100.0 * ($me.boletas - $me.rechazadas) / $me.boletas, 1) }
+    if ($null -ne $emH) {
+      if ($null -ne $emH.ef) { $efE = $emH.ef }
+      elseif ($null -ne $emH.boletas -and [double]$emH.boletas -gt 0) { $efE = [math]::Round(100.0 * ($emH.boletas - $emH.rechazadas) / $emH.boletas, 1) }
     }
     $maEmp += '{"nombre":"' + $emx.nombre + '","ef":' + (([string]$efE) -replace ",", ".") + '}'
   }
