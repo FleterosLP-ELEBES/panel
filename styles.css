@@ -282,6 +282,49 @@ main { max-width: 1080px; margin: 0 auto; padding: 22px 20px 60px; }
   main { padding: 30px 32px 70px; }
 }
 
+/* ---------- Tarjeta de cierre de mes ---------- */
+.cierre {
+  position: relative; color: #fff; border-radius: var(--r);
+  padding: 20px 18px 16px; margin-bottom: 18px; overflow: hidden;
+  background: linear-gradient(135deg, #2E9E5B 0%, #1E6E9E 55%, #24455E 100%);
+  box-shadow: 0 12px 34px rgba(20,40,60,.4);
+}
+.cierre::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle at 18% 12%, rgba(255,255,255,.18), transparent 42%);
+}
+.cierre > * { position: relative; z-index: 1; }
+.cierre__x {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  width: 30px; height: 30px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,.18); color: #fff; font-size: 20px; line-height: 1;
+  cursor: pointer; transition: background .15s ease;
+}
+.cierre__x:hover { background: rgba(255,255,255,.32); }
+.cierre__top {
+  display: inline-block; font-size: 13px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .05em;
+  background: rgba(255,255,255,.16); padding: 6px 13px; border-radius: 999px; margin-bottom: 14px;
+}
+.cierre__ef { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.cierre__efnum { font-size: 46px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+.cierre__eflbl { font-size: 12.5px; opacity: .9; font-weight: 600; line-height: 1.3; }
+.cierre__emps { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.cierre__emp {
+  flex: 1; min-width: 130px; background: rgba(255,255,255,.13); border-radius: var(--r-sm);
+  padding: 9px 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.cierre__emp span { font-size: 12.5px; opacity: .92; font-weight: 600; }
+.cierre__emp b { font-size: 17px; font-weight: 800; }
+.cierre__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cierre__dato {
+  background: rgba(255,255,255,.1); border-radius: var(--r-sm);
+  padding: 9px 13px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.cierre__dato span { font-size: 12px; opacity: .88; font-weight: 600; }
+.cierre__dato b { font-size: 14.5px; font-weight: 800; }
+@media (min-width: 720px) { .cierre__grid { grid-template-columns: repeat(4, 1fr); } }
+
 /* ---------- Fondo oscuro con patrón de reparto (SIEMPRE al final del archivo) ---------- */
 body {
   background-color: #232B33;
