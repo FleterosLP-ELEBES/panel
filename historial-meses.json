@@ -25,5 +25,32 @@
                                                        "boletas":  3721
                                                    }
                                  }
+                },
+    "2026-08":  {
+                    "efGeneral":  100,
+                    "fleteros":  13,
+                    "clientesEnt":  193,
+                    "boletasSac":  334,
+                    "entregadas":  361,
+                    "boletasRech":  0,
+                    "boletas":  361,
+                    "actualizado":  "2026-08-03",
+                    "clientesSac":  193,
+                    "repartos":  14,
+                    "plataRech":  0,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  0,
+                                                    "ef":  100,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  158
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  0,
+                                                       "ef":  100,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  176
+                                                   }
+                                 }
                 }
 }
