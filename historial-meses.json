@@ -1,31 +1,4 @@
 {
-    "2026-07":  {
-                    "efGeneral":  90.3,
-                    "fleteros":  16,
-                    "clientesEnt":  4248,
-                    "boletasSac":  7455,
-                    "entregadas":  7324,
-                    "boletasRech":  493,
-                    "boletas":  8115,
-                    "actualizado":  "2026-08-03",
-                    "clientesSac":  4485,
-                    "repartos":  274,
-                    "plataRech":  46349192,
-                    "empresas":  {
-                                     "elebes":  {
-                                                    "rechazadas":  338,
-                                                    "ef":  90.9,
-                                                    "nombre":  "Elebes S.A.",
-                                                    "boletas":  3734
-                                                },
-                                     "lagopuelo":  {
-                                                       "rechazadas":  448,
-                                                       "ef":  88,
-                                                       "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  3721
-                                                   }
-                                 }
-                },
     "2026-08":  {
                     "efGeneral":  100,
                     "fleteros":  13,
@@ -52,5 +25,114 @@
                                                        "boletas":  176
                                                    }
                                  }
+                },
+    "2026-07":  {
+                    "clientesSac":  4485,
+                    "repartos":  274,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  342,
+                                                    "ef":  90.8,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  3734
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  448,
+                                                       "ef":  88,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  3721
+                                                   }
+                                 },
+                    "plataRech":  46664342,
+                    "boletasSac":  7455,
+                    "entregadas":  7319,
+                    "ranking":  [
+                                    {
+                                        "nombre":  "Johana Vigil",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Emiliano Juan Amarilla",
+                                        "repartos":  22,
+                                        "ef":  95.7
+                                    },
+                                    {
+                                        "nombre":  "Luciano Gasparini",
+                                        "repartos":  1,
+                                        "ef":  95.5
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  23,
+                                        "ef":  94.4
+                                    },
+                                    {
+                                        "nombre":  "Walter Tenore",
+                                        "repartos":  23,
+                                        "ef":  94.2
+                                    },
+                                    {
+                                        "nombre":  "Juan Escoto",
+                                        "repartos":  19,
+                                        "ef":  93.3
+                                    },
+                                    {
+                                        "nombre":  "Nahuel Montoya",
+                                        "repartos":  17,
+                                        "ef":  92.2
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  23,
+                                        "ef":  91.7
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  23,
+                                        "ef":  91.3
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  20,
+                                        "ef":  87.8
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  18,
+                                        "ef":  87.7
+                                    },
+                                    {
+                                        "nombre":  "Ivan Montoya",
+                                        "repartos":  17,
+                                        "ef":  87.2
+                                    },
+                                    {
+                                        "nombre":  "Walter Janiuk",
+                                        "repartos":  17,
+                                        "ef":  86.5
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  17,
+                                        "ef":  86.2
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
+                                        "repartos":  17,
+                                        "ef":  84.8
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  16,
+                                        "ef":  84
+                                    }
+                                ],
+                    "boletas":  8115,
+                    "clientesEnt":  4248,
+                    "boletasRech":  493,
+                    "fleteros":  16,
+                    "actualizado":  "2026-08-03",
+                    "efGeneral":  90.2
                 }
 }
