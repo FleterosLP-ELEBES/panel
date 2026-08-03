@@ -26,6 +26,26 @@ jobs:
         shell: powershell
         run: tzutil /s "Argentina Standard Time"
 
+      # Ventana de cierre (dias 8-15): re-baja el MES ANTERIOR completo y, si ya
+      # estan todos los camiones cerrados, lo marca definitivo (deja de re-bajarlo).
+      # Solo toca el historial; el robot self-skip evita re-bajar si ya esta cerrado.
+      - name: Refrescar mes anterior (cierre de camiones)
+        shell: powershell
+        env:
+          GESCOM_REALM: ${{ secrets.GESCOM_REALM }}
+          GESCOM_USUARIO: ${{ secrets.GESCOM_USUARIO }}
+          GESCOM_CLAVE: ${{ secrets.GESCOM_CLAVE }}
+        run: |
+          $dia = [int](Get-Date -Format "dd")
+          if ($dia -ge 8 -and $dia -le 15) {
+            $mesAnt = (Get-Date -Day 1).AddMonths(-1).ToString("yyyy-MM")
+            $env:FORCE_MES = $mesAnt
+            Write-Output ("Ventana de cierre (dia " + $dia + "): refrescando mes anterior " + $mesAnt)
+            powershell -NoProfile -File robot-nube.ps1
+          } else {
+            Write-Output ("Dia " + $dia + ": fuera de la ventana de cierre, no se refresca el mes anterior")
+          }
+
       - name: Correr robot (API Gescom)
         shell: powershell
         env:
