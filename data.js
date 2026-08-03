@@ -1,5 +1,5 @@
 /* GENERADO AUTOMATICAMENTE por robot-nube.ps1 (API Gescom, GitHub Actions) - NO EDITAR A MANO
-   Ultima actualizacion: 2026-08-03 07:36 */
+   Ultima actualizacion: 2026-08-03 09:26 */
 window.__LPE_DATA__ = { registros: [
  {"fecha":"2026-08-03","fletero":"Claudio Garcia","repartos":1,"boletas":20,"entregadas":20,"itemsRech":0}
 ,{"fecha":"2026-08-03","fletero":"Diego Zacarias","repartos":1,"boletas":46,"entregadas":46,"itemsRech":0}

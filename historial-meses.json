@@ -111,6 +111,7 @@
     "2026-08":  {
                     "clientesSac":  193,
                     "repartos":  14,
+                    "cierreFinal":  false,
                     "empresas":  {
                                      "elebes":  {
                                                     "rechazadas":  0,
