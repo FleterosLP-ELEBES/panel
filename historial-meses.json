@@ -1,17 +1,28 @@
 {
     "2026-07":  {
-                    "entregadas":  7349,
-                    "actualizado":  "2026-07-31",
+                    "efGeneral":  90.3,
+                    "fleteros":  16,
+                    "clientesEnt":  4248,
+                    "boletasSac":  7455,
+                    "entregadas":  7324,
+                    "boletasRech":  493,
+                    "boletas":  8115,
+                    "actualizado":  "2026-08-03",
+                    "clientesSac":  4485,
                     "repartos":  274,
-                    "boletas":  8113,
+                    "plataRech":  46349192,
                     "empresas":  {
                                      "elebes":  {
-                                                    "rechazadas":  323,
+                                                    "rechazadas":  338,
+                                                    "ef":  90.9,
+                                                    "nombre":  "Elebes S.A.",
                                                     "boletas":  3734
                                                 },
                                      "lagopuelo":  {
-                                                       "rechazadas":  437,
-                                                       "boletas":  3719
+                                                       "rechazadas":  448,
+                                                       "ef":  88,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  3721
                                                    }
                                  }
                 }
