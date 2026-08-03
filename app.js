@@ -157,6 +157,7 @@
       dato("Boletas entregadas", fmtNum(ma.boletasEnt) + " / " + fmtNum(ma.boletasSac));
     if (ma.clientesSac > 0) filas += dato("Clientes entregados", fmtNum(ma.clientesEnt) + " / " + fmtNum(ma.clientesSac));
     if (ma.plataRech > 0) filas += dato("Rechazo en plata", fmtPlata(ma.plataRech));
+    var hayRanking = ma.ranking && ma.ranking.length;
     var card = el("div", "cierre reveal");
     card.innerHTML =
       '<button class="cierre__x" aria-label="Cerrar">&times;</button>' +
@@ -164,12 +165,61 @@
       '<div class="cierre__ef"><span class="cierre__efnum">' + fmtPct(ma.efGeneral) + '</span>' +
         '<span class="cierre__eflbl">efectividad general del mes<br>' + fmtNum(ma.fleteros) + ' fleteros</span></div>' +
       (empHtml ? '<div class="cierre__emps">' + empHtml + '</div>' : '') +
-      '<div class="cierre__grid">' + filas + '</div>';
+      '<div class="cierre__grid">' + filas + '</div>' +
+      (hayRanking ? '<button class="cierre__ver">Ver cómo quedó cada fletero →</button>' : '');
     card.querySelector(".cierre__x").addEventListener("click", function () {
       try { localStorage.setItem("lpe_cierre_" + ma.clave, "1"); } catch (e) {}
       card.parentNode && card.parentNode.removeChild(card);
     });
+    if (hayRanking) {
+      card.querySelector(".cierre__ver").addEventListener("click", function () {
+        seleccionar("__cierre__");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
     return card;
+  }
+
+  // ---- Vista: ranking final del mes cerrado -----------------------------
+  function vistaCierreDetalle(datos) {
+    var cont = el("div", "view");
+    var ma = datos.mesAnterior;
+    var volver = el("button", "volver", "← Volver al resumen");
+    volver.addEventListener("click", function () {
+      seleccionar("__general__");
+      var sel = $("#selector"); if (sel) sel.value = "__general__";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    cont.appendChild(volver);
+    if (!ma || !ma.ranking || !ma.ranking.length) {
+      cont.appendChild(el("p", "muted", "No hay detalle del mes anterior todavía."));
+      return cont;
+    }
+    var nombreMes = (NOMBRES_MES[(ma.mes || 1) - 1] || "") + " " + (ma.anio || "");
+    var lista = ma.ranking.slice().sort(function (a, b) { return (b.ef || 0) - (a.ef || 0); });
+    var tabla = el("div", "rank reveal");
+    var head =
+      '<div class="rank__head"><span>#</span><span>Fletero</span>' +
+      '<span class="rank__num">Repartos</span><span class="rank__num">Entrega</span></div>';
+    var body = lista.map(function (f, i) {
+      var medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+      var bar = Math.max(4, Math.min(100, f.ef || 0));
+      return '<div class="rank__row rank__row--static">' +
+        '<span class="rank__pos">' + medal + '</span>' +
+        '<span class="rank__name"><b>' + f.nombre + '</b>' +
+          '<i class="rank__track"><i class="rank__fill rank__fill--' + claseColor(f.ef) + '" style="width:2%" data-w="' + bar + '"></i></i>' +
+        '</span>' +
+        '<span class="rank__num rank__reps">' + f.repartos + '<small>repartos</small></span>' +
+        '<span class="rank__num">' + chip(f.ef) + '</span>' +
+      '</div>';
+    }).join("");
+    tabla.innerHTML =
+      '<h2 class="rank__title">🏁 Así cerró ' + nombreMes + ' · ranking final</h2>' +
+      '<div class="rank__grid">' + head + body + '</div>' +
+      '<p class="rank__hint">Efectividad y repartos definitivos de cada fletero en ' +
+        (NOMBRES_MES[(ma.mes || 1) - 1] || "") + '.</p>';
+    cont.appendChild(tabla);
+    return cont;
   }
 
   // ---- Vista: resumen general -------------------------------------------
@@ -416,7 +466,9 @@
     main.innerHTML = "";
     var v = STATE.seleccion === "__general__"
       ? vistaGeneral(STATE.datos)
-      : vistaFletero(STATE.datos, STATE.seleccion);
+      : STATE.seleccion === "__cierre__"
+        ? vistaCierreDetalle(STATE.datos)
+        : vistaFletero(STATE.datos, STATE.seleccion);
     main.appendChild(v);
 
     activarReveal(main);
@@ -440,7 +492,8 @@
 
   function seleccionar(nombre) {
     STATE.seleccion = nombre;
-    try { localStorage.setItem("lpe_fletero", nombre); } catch (e) {}
+    // No persistimos la vista transitoria del cierre de mes
+    if (nombre !== "__cierre__") { try { localStorage.setItem("lpe_fletero", nombre); } catch (e) {} }
     render();
   }
 
