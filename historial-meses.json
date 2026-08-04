@@ -109,98 +109,108 @@
                     "efGeneral":  90.2
                 },
     "2026-08":  {
-                    "clientesSac":  193,
-                    "repartos":  14,
+                    "clientesSac":  412,
+                    "repartos":  30,
                     "cierreFinal":  false,
                     "empresas":  {
                                      "elebes":  {
                                                     "rechazadas":  0,
                                                     "ef":  100,
                                                     "nombre":  "Elebes S.A.",
-                                                    "boletas":  158
+                                                    "boletas":  346
                                                 },
                                      "lagopuelo":  {
                                                        "rechazadas":  0,
                                                        "ef":  100,
                                                        "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  176
+                                                       "boletas":  377
                                                    }
                                  },
                     "plataRech":  0,
-                    "boletasSac":  334,
-                    "entregadas":  361,
+                    "boletasSac":  723,
+                    "entregadas":  769,
                     "ranking":  [
                                     {
                                         "nombre":  "Hernan Rivero",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Walter Janiuk",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Simon Olivera",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Walter Tenore",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Claudio Garcia",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Juan Escoto",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Walter Tenore",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
                                         "repartos":  1,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Ivan Montoya",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcelo Vacca",
                                         "repartos":  1,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Mariano Sosa",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Miguel Angel Pallini",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Leonardo Santa Cruz",
-                                        "repartos":  1,
+                                        "repartos":  3,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Nahuel Montoya",
-                                        "repartos":  2,
+                                        "repartos":  3,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Diego Zacarias",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Emiliano Juan Amarilla",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     }
                                 ],
-                    "boletas":  361,
-                    "clientesEnt":  193,
+                    "boletas":  769,
+                    "clientesEnt":  412,
                     "boletasRech":  0,
-                    "fleteros":  13,
-                    "actualizado":  "2026-08-03",
+                    "fleteros":  15,
+                    "actualizado":  "2026-08-04",
                     "efGeneral":  100
                 }
 }
