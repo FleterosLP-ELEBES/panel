@@ -228,5 +228,90 @@
                     "fleteros":  18,
                     "actualizado":  "2026-08-31",
                     "efGeneral":  91.4
+                },
+    "2026-09":  {
+                    "clientesSac":  213,
+                    "repartos":  11,
+                    "cierreFinal":  false,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  0,
+                                                    "ef":  100,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  260
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  0,
+                                                       "ef":  100,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  210
+                                                   }
+                                 },
+                    "plataRech":  0,
+                    "boletasSac":  470,
+                    "entregadas":  501,
+                    "ranking":  [
+                                    {
+                                        "nombre":  "Ivan Montoya",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Juan Escoto",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Emiliano Juan Amarilla",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    }
+                                ],
+                    "boletas":  501,
+                    "clientesEnt":  213,
+                    "boletasRech":  0,
+                    "fleteros":  11,
+                    "actualizado":  "2026-09-01",
+                    "efGeneral":  100
                 }
 }
