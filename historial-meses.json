@@ -230,27 +230,37 @@
                     "efGeneral":  91.4
                 },
     "2026-09":  {
-                    "clientesSac":  213,
-                    "repartos":  11,
+                    "clientesSac":  391,
+                    "repartos":  23,
                     "cierreFinal":  false,
                     "empresas":  {
                                      "elebes":  {
-                                                    "rechazadas":  0,
-                                                    "ef":  100,
+                                                    "rechazadas":  3,
+                                                    "ef":  99.4,
                                                     "nombre":  "Elebes S.A.",
-                                                    "boletas":  260
+                                                    "boletas":  496
                                                 },
                                      "lagopuelo":  {
                                                        "rechazadas":  0,
                                                        "ef":  100,
                                                        "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  210
+                                                       "boletas":  367
                                                    }
                                  },
-                    "plataRech":  0,
-                    "boletasSac":  470,
-                    "entregadas":  501,
+                    "plataRech":  19814536,
+                    "boletasSac":  863,
+                    "entregadas":  889,
                     "ranking":  [
+                                    {
+                                        "nombre":  "Walter Janiuk",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
                                     {
                                         "nombre":  "Ivan Montoya",
                                         "repartos":  1,
@@ -258,41 +268,21 @@
                                     },
                                     {
                                         "nombre":  "Claudio Garcia",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Marcos Sanchez",
-                                        "repartos":  1,
+                                        "repartos":  2,
                                         "ef":  100
                                     },
                                     {
                                         "nombre":  "Juan Escoto",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
                                         "repartos":  1,
                                         "ef":  100
                                     },
                                     {
-                                        "nombre":  "Leonardo Santa Cruz",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Emiliano Juan Amarilla",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Miguel Angel Pallini",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Diego Zacarias",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Simon Olivera",
+                                        "nombre":  "Nahuel Montoya",
                                         "repartos":  1,
                                         "ef":  100
                                     },
@@ -302,16 +292,41 @@
                                         "ef":  100
                                     },
                                     {
-                                        "nombre":  "Hernan Rivero",
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Emiliano Juan Amarilla",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Luciano Gasparini",
                                         "repartos":  1,
                                         "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  3,
+                                        "ef":  95.1
                                     }
                                 ],
-                    "boletas":  501,
-                    "clientesEnt":  213,
-                    "boletasRech":  0,
-                    "fleteros":  11,
-                    "actualizado":  "2026-09-01",
-                    "efGeneral":  100
+                    "boletas":  893,
+                    "clientesEnt":  391,
+                    "boletasRech":  1,
+                    "fleteros":  14,
+                    "actualizado":  "2026-09-02",
+                    "efGeneral":  99.6
                 }
 }
