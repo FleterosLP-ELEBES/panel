@@ -27,6 +27,17 @@ $EMPRESAS = @(
   @{ id = "elebes";    nombre = "Elebes S.A.";     logo = "assets/img/logo-elebes.jpg" }
 )
 
+# Excepcion PUNTUAL (pedido de Lucas 7/9/2026; SOLO panel, NO se toca Gescom):
+# a Marcos Sanchez NO se le cuentan como rechazo las notas "MAL FACTURADO" (fue
+# error de administracion, no del fletero). Se saca de TODO: rechazo en plata,
+# boletas rechazadas, motivos y efectividad de entrega. Para revertir: vaciar
+# $EXC_CHOFER = "".
+$EXC_CHOFER = "MARCOS SANCHEZ"
+function EsExcMalFact($chofer, $motivo) {
+  if (-not $EXC_CHOFER -or $chofer -ne $EXC_CHOFER) { return $false }
+  return ((([string]$motivo).Trim().ToUpper()) -match "MAL FACTURAD")
+}
+
 function Log($msg) {
   # OJO: [Console] y no Write-Output — dentro de una funcion, Write-Output se
   # mezcla con el valor de retorno y contamina los datos (bug ya sufrido).
@@ -214,6 +225,8 @@ foreach ($idv in @($ventasPorId.Keys)) {
   } elseif ($tipoV -eq "DEV-RE") {
     if ($fpDia -and $fpDia -lt $fechaRep) {
       $entregas[$clave].asig++; $entregas[$clave].real++
+    } elseif (EsExcMalFact $choferRep $vv.motivo) {
+      # Excepcion: MAL FACTURADO de Marcos no resta (la boleta original ya conto como entregada)
     } else {
       $entregas[$clave].real--
       foreach ($itx in @($vv.items)) {
@@ -272,6 +285,8 @@ foreach ($idv in @($ventasPorId.Keys)) {
       $choProvFact[$kcp] += $iimp
     }
   } else {
+    # Excepcion puntual: MAL FACTURADO de Marcos no cuenta como rechazo (ver arriba)
+    if (EsExcMalFact $chox $vv.motivo) { continue }
     $refx = ""
     if ($null -ne $vv.ventaReferenciada -and $null -ne $vv.ventaReferenciada.id) { $refx = [string]$vv.ventaReferenciada.id }
     if (-not $refx) { $refx = $idv }
