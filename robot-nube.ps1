@@ -28,14 +28,14 @@ $EMPRESAS = @(
 )
 
 # Excepcion PUNTUAL (pedido de Lucas 7/9/2026; SOLO panel, NO se toca Gescom):
-# a Marcos Sanchez NO se le cuentan como rechazo las notas "MAL FACTURADO" (fue
-# error de administracion, no del fletero). Se saca de TODO: rechazo en plata,
-# boletas rechazadas, motivos y efectividad de entrega. Para revertir: vaciar
-# $EXC_CHOFER = "".
-$EXC_CHOFER = "MARCOS SANCHEZ"
-function EsExcMalFact($chofer, $motivo) {
-  if (-not $EXC_CHOFER -or $chofer -ne $EXC_CHOFER) { return $false }
-  return ((([string]$motivo).Trim().ToUpper()) -match "MAL FACTURAD")
+# SOLO estas 3 notas MAL FACTURADO de Marcos (SILVI-LORE, reparto 3017 del 1/9;
+# error de administracion, no del fletero) NO cuentan como rechazo. Se sacan de
+# TODO: rechazo en plata, boletas rechazadas, motivos y efectividad. Son SOLO
+# estas 3 por numero de nota de credito, NO cualquier MAL FACTURADO. Revertir:
+# vaciar la lista $EXC_NOTAS = @().
+$EXC_NOTAS = @("118145", "118132", "118146")
+function EsExcNota($vv) {
+  return ([string]$vv.numeroComprobante -in $EXC_NOTAS)
 }
 
 function Log($msg) {
@@ -225,8 +225,8 @@ foreach ($idv in @($ventasPorId.Keys)) {
   } elseif ($tipoV -eq "DEV-RE") {
     if ($fpDia -and $fpDia -lt $fechaRep) {
       $entregas[$clave].asig++; $entregas[$clave].real++
-    } elseif (EsExcMalFact $choferRep $vv.motivo) {
-      # Excepcion: MAL FACTURADO de Marcos no resta (la boleta original ya conto como entregada)
+    } elseif (EsExcNota $vv) {
+      # Excepcion puntual: estas 3 notas no restan (la boleta original ya conto como entregada)
     } else {
       $entregas[$clave].real--
       foreach ($itx in @($vv.items)) {
@@ -285,8 +285,8 @@ foreach ($idv in @($ventasPorId.Keys)) {
       $choProvFact[$kcp] += $iimp
     }
   } else {
-    # Excepcion puntual: MAL FACTURADO de Marcos no cuenta como rechazo (ver arriba)
-    if (EsExcMalFact $chox $vv.motivo) { continue }
+    # Excepcion puntual: estas 3 notas no cuentan como rechazo (ver arriba)
+    if (EsExcNota $vv) { continue }
     $refx = ""
     if ($null -ne $vv.ventaReferenciada -and $null -ne $vv.ventaReferenciada.id) { $refx = [string]$vv.ventaReferenciada.id }
     if (-not $refx) { $refx = $idv }
