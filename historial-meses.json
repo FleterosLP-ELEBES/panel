@@ -230,26 +230,26 @@
                     "efGeneral":  90.4
                 },
     "2026-09":  {
-                    "clientesSac":  3775,
-                    "repartos":  240,
+                    "clientesSac":  3982,
+                    "repartos":  253,
                     "cierreFinal":  false,
                     "empresas":  {
                                      "elebes":  {
-                                                    "rechazadas":  295,
-                                                    "ef":  93.2,
+                                                    "rechazadas":  316,
+                                                    "ef":  93,
                                                     "nombre":  "Elebes S.A.",
-                                                    "boletas":  4337
+                                                    "boletas":  4541
                                                 },
                                      "lagopuelo":  {
-                                                       "rechazadas":  267,
-                                                       "ef":  93.1,
+                                                       "rechazadas":  290,
+                                                       "ef":  93,
                                                        "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  3850
+                                                       "boletas":  4114
                                                    }
                                  },
-                    "plataRech":  28721912,
-                    "boletasSac":  8187,
-                    "entregadas":  8043,
+                    "plataRech":  31217899,
+                    "boletasSac":  8655,
+                    "entregadas":  8578,
                     "ranking":  [
                                     {
                                         "nombre":  "Leo Semi",
@@ -263,63 +263,63 @@
                                     },
                                     {
                                         "nombre":  "Juan Escoto",
-                                        "repartos":  19,
+                                        "repartos":  20,
                                         "ef":  96.5
                                     },
                                     {
                                         "nombre":  "Claudio Garcia",
-                                        "repartos":  20,
-                                        "ef":  95.8
-                                    },
-                                    {
-                                        "nombre":  "Luciano Gasparini",
-                                        "repartos":  14,
-                                        "ef":  95
+                                        "repartos":  21,
+                                        "ef":  95.4
                                     },
                                     {
                                         "nombre":  "Miguel Angel Pallini",
-                                        "repartos":  12,
-                                        "ef":  95
+                                        "repartos":  13,
+                                        "ef":  95.1
                                     },
                                     {
-                                        "nombre":  "Marcos Sanchez",
-                                        "repartos":  18,
-                                        "ef":  94.6
+                                        "nombre":  "Luciano Gasparini",
+                                        "repartos":  15,
+                                        "ef":  95.1
                                     },
                                     {
                                         "nombre":  "Emiliano Juan Amarilla",
-                                        "repartos":  17,
-                                        "ef":  94.6
+                                        "repartos":  18,
+                                        "ef":  94.9
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  19,
+                                        "ef":  94.7
                                     },
                                     {
                                         "nombre":  "Walter Janiuk",
+                                        "repartos":  19,
+                                        "ef":  94.3
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
                                         "repartos":  18,
-                                        "ef":  93.8
+                                        "ef":  92.4
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  22,
+                                        "ef":  92.2
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  20,
+                                        "ef":  92
                                     },
                                     {
                                         "nombre":  "Leonardo Santa Cruz",
                                         "repartos":  18,
-                                        "ef":  93.7
-                                    },
-                                    {
-                                        "nombre":  "Hernan Rivero",
-                                        "repartos":  17,
-                                        "ef":  92.3
-                                    },
-                                    {
-                                        "nombre":  "Simon Olivera",
-                                        "repartos":  19,
-                                        "ef":  92.1
-                                    },
-                                    {
-                                        "nombre":  "Mariano Sosa",
-                                        "repartos":  20,
-                                        "ef":  91.5
+                                        "ef":  91.9
                                     },
                                     {
                                         "nombre":  "Diego Zacarias",
-                                        "repartos":  16,
-                                        "ef":  91.3
+                                        "repartos":  17,
+                                        "ef":  90.4
                                     },
                                     {
                                         "nombre":  "Nahuel Montoya",
@@ -328,15 +328,15 @@
                                     },
                                     {
                                         "nombre":  "Ivan Montoya",
-                                        "repartos":  16,
-                                        "ef":  89.1
+                                        "repartos":  17,
+                                        "ef":  88.8
                                     }
                                 ],
-                    "boletas":  8613,
-                    "clientesEnt":  3627,
-                    "boletasRech":  375,
+                    "boletas":  9193,
+                    "clientesEnt":  3820,
+                    "boletasRech":  409,
                     "fleteros":  16,
-                    "actualizado":  "2026-09-23",
-                    "efGeneral":  93.4
+                    "actualizado":  "2026-09-24",
+                    "efGeneral":  93.3
                 }
 }
