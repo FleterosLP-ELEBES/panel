@@ -188,9 +188,16 @@ foreach ($ar in @($artRaw)) {
 }
 Log ("Catalogos: " + $mapaChofer.Count + " choferes, " + $mapaVend.Count + " vendedores, " + $mapaProvNombre.Count + " proveedores, " + $mapaArtProv.Count + " articulos")
 
-# --- 3) Ventas (dia por dia, por fecha de CARGA, margen 21 dias) ------------
+# --- 3) Ventas (dia por dia, por fecha de CARGA, margen 7 dias) -------------
+# El margen existe porque una boleta entregada este mes pudo cargarse el mes
+# pasado: la preventa se carga antes de entregarse.
+# 7 DIAS, antes eran 21 (Lucas, 28/9/2026). Medido en Pehuenia sobre las 4.702
+# ventas entregadas del 1 al 7 de septiembre: 970 se habian cargado en agosto, y
+# de esas 912 el 31 de agosto -el ultimo dia del mes-. Con 7 dias se recuperan
+# 968 de 970: se pierden 2 de 4.702. Los 21 costaban 14 dias de bajada de mas.
+$MARGEN_DIAS = 7
 $ventasPorId = @{}
-$diaDesc = $mesIniDt.AddDays(-21)
+$diaDesc = $mesIniDt.AddDays(-$MARGEN_DIAS)
 $hastaDesc = (Get-Date).Date
 while ($diaDesc -le $hastaDesc) {
   $dd1 = $diaDesc.ToString("yyyy-MM-dd")
