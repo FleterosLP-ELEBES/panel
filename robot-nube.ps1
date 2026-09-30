@@ -63,47 +63,61 @@ if ($EN_NUBE -and $env:GITHUB_EVENT_NAME -eq "schedule" -and -not $env:FORCE_MES
   }
 }
 
-# --- Credenciales -----------------------------------------------------------
-# Secretos de Actions (con Trim: un \r\n colado rompe el login de Keycloak)
-$credU = ""; $credC = ""; $credR = ""
-if ($env:GESCOM_USUARIO) {
-  $credU = ([string]$env:GESCOM_USUARIO).Trim()
-  $credC = ([string]$env:GESCOM_CLAVE).Trim()
-  $credR = ([string]$env:GESCOM_REALM).Trim()
-} else {
-  $credArch = Join-Path $CARPETA_PROYECTO "robot\gescom-api.txt"
-  foreach ($lin in Get-Content $credArch -Encoding UTF8) {
-    $par = $lin.Split("=", 2)
-    if ($par.Count -eq 2) {
-      if ($par[0].Trim() -eq "USUARIO") { $credU = $par[1].Trim() }
-      if ($par[0].Trim() -eq "CLAVE") { $credC = $par[1].Trim() }
-      if ($par[0].Trim() -eq "REALM") { $credR = $par[1].Trim() }
+# --- Fuente: BASE de Gescom (datos-gescom) ----------------------------------
+# Desde el 30/9/2026 el robot NO le pide nada a la API de Gescom: lee la base
+# gescom-lagopuelo por datos-gescom con una clave propia del panel (secreto
+# DATOS_GESCOM_CLAVE). Tope 120 consultas/hora y 20.000 filas/respuesta, por eso
+# las consultas grandes se paginan. Una corrida usa unas 10.
+$URL_BASE = "https://datos-gescom.panelempresas.workers.dev/consulta"
+# Trim: un salto de linea colado en un secreto rompe el encabezado
+$claveBase = ([string]$env:DATOS_GESCOM_CLAVE).Trim()
+if (-not $claveBase) {
+  # Modo prueba local: la clave del panel, del archivo de claves de la base
+  $archClaves = "C:\Users\luqaa\Documents\Panel-Ventas\base\claves-companeros.txt"
+  if (Test-Path $archClaves) {
+    foreach ($lg in Get-Content $archClaves -Encoding UTF8) {
+      if ($lg -match '^PANEL-FLETEROS-LPE \(.*\): (\S+)\s*$') { $claveBase = $matches[1] }
     }
   }
 }
-if (-not $credU -or -not $credC -or -not $credR) { Log "ERROR: faltan credenciales de Gescom"; exit 1 }
+if (-not $claveBase) { Log "ERROR: falta el secreto DATOS_GESCOM_CLAVE (la clave del panel para leer la base)"; exit 1 }
+$script:nConsultas = 0
 
-$script:tokenApi = $null
-function Get-TokenGescom {
-  $cuerpo = @{ grant_type = "password"; client_id = "gcw-web-api"; username = $credU; password = $credC }
-  $script:tokenApi = (Invoke-RestMethod -Method Post -Uri ("https://auth.gescom.online/realms/" + $credR + "/protocol/openid-connect/token") -Body $cuerpo -TimeoutSec 30).access_token
-}
-Get-TokenGescom
-$BASE_API = "https://elebes.gescom.online/data/cmd"
-
-function Get-Api($ruta) {
-  $esperas = @(0, 10, 30, 60, 120, 180)
-  foreach ($espera in $esperas) {
-    if ($espera -gt 0) { Start-Sleep -Seconds $espera }
+function Get-Base($sql) {
+  # Una consulta SELECT a la base. Reintenta ante cortes de red o fallas del
+  # servidor; corta enseguida si la base rechaza la consulta (400), la clave (401)
+  # o el tope por hora (429). Una respuesta CORTADA (>20.000 filas) tambien aborta.
+  # OJO: devuelve la lista con la coma adelante; asignarla a una variable y
+  # recorrer esa variable (nunca @(Get-Base ...), que la envuelve en 1 elemento).
+  $cuerpo = [System.Text.Encoding]::UTF8.GetBytes((@{ sql = $sql } | ConvertTo-Json -Compress))
+  $esperas = @(10, 30, 60); $n = 0
+  while ($true) {
     try {
-      return Invoke-RestMethod -Uri "$BASE_API/$ruta" -Headers @{ Authorization = "Bearer $script:tokenApi" } -TimeoutSec 120
+      $script:nConsultas++
+      $r = Invoke-RestMethod -Method Post -Uri $URL_BASE -Headers @{ Authorization = "Bearer " + $claveBase } `
+        -ContentType "application/json; charset=utf-8" -Body $cuerpo -TimeoutSec 120
+      break
     } catch {
-      $st = 0; try { $st = [int]$_.Exception.Response.StatusCode } catch {}
-      if ($st -eq 401) { Get-TokenGescom; continue }
-      Log "  reintento ($st) $($ruta.Split('?')[0])"
+      $st = 0; try { $st = [int]$_.Exception.Response.StatusCode } catch { }
+      if ($st -eq 400 -or $st -eq 401 -or $st -eq 429 -or $n -ge $esperas.Count) { throw }
+      Start-Sleep -Seconds $esperas[$n]; $n++
     }
   }
-  throw "API sin respuesta: $ruta"
+  if ($r.truncado) { throw ("la base corto la respuesta en " + $r.cantidad + " filas (hay que paginar): " + $sql.Substring(0, [Math]::Min(90, $sql.Length))) }
+  return ,@($r.filas)
+}
+
+function Get-BasePaginado($sql, $orden) {
+  # Para consultas que pueden pasar las 20.000 filas: de a 15.000, en orden fijo.
+  $todo = New-Object System.Collections.ArrayList
+  $desde = 0; $pag = 15000
+  while ($true) {
+    $f = Get-Base ($sql + " ORDER BY " + $orden + " LIMIT " + $pag + " OFFSET " + $desde)
+    foreach ($x in $f) { [void]$todo.Add($x) }
+    if ($f.Count -lt $pag) { break }
+    $desde += $pag
+  }
+  return ,$todo
 }
 
 # --- Mes en curso ------------------------------------------------------------
@@ -133,73 +147,97 @@ if ($env:FORCE_MES -match '^\d{4}-\d{2}$') {
   }
 }
 
-# --- 1) Repartos del mes ----------------------------------------------------
-$repartosRaw = Get-Api "distribucion/api/v1/get-repartos?fechadesde=$mesIni&fechahasta=$mesFinExcl"
-$listaRepartos = @($repartosRaw)
-if ($listaRepartos.Count -eq 0) {
+# --- 1) Repartos del mes (de la base) ---------------------------------------
+# fechahasta es EXCLUSIVA (como antes con la API): fecha < mesFinExcl.
+function Repartos-DelMes($desde, $hastaExcl) {
+  return Get-Base ("SELECT codigo, fecha, chofer, nombre_chofer, cerrado FROM repartos " +
+    "WHERE fecha >= '" + $desde + "' AND fecha < '" + $hastaExcl + "'")
+}
+$listaRepartos = Repartos-DelMes $mesIni $mesFinExcl
+if (@($listaRepartos).Count -eq 0) {
   $mesIniDt = $mesIniDt.AddMonths(-1)
   $mesIni = $mesIniDt.ToString("yyyy-MM-01")
   $mesActual = $mesIniDt.ToString("yyyy-MM")
   $mesFinExcl = $mesIniDt.AddMonths(1).ToString("yyyy-MM-dd")
-  $repartosRaw = Get-Api "distribucion/api/v1/get-repartos?fechadesde=$mesIni&fechahasta=$mesFinExcl"
-  $listaRepartos = @($repartosRaw)
+  $listaRepartos = Repartos-DelMes $mesIni $mesFinExcl
 }
 $repInfo = @{}
 $repAbiertos = 0   # camiones del mes todavia sin cerrar (rendir)
 foreach ($rpx in $listaRepartos) {
-  $fch = ([string]$rpx.fecha).Substring(0, 10)
+  $fch = [string]$rpx.fecha
+  if ($fch.Length -lt 10) { continue }
+  $fch = $fch.Substring(0, 10)
   if ($fch -gt $hoy) { continue }
-  if ($rpx.cerrado -ne $true) { $repAbiertos++ }
-  $repInfo[[string]$rpx.codigo] = @{ fecha = $fch; chofer = (([string]$rpx.nombreChofer).Trim().ToUpper() -replace "\s+", " ") }
+  if ([int]$rpx.cerrado -ne 1) { $repAbiertos++ }
+  $choR = ""
+  if ($rpx.nombre_chofer) { $choR = (([string]$rpx.nombre_chofer).Trim().ToUpper() -replace "\s+", " ") }
+  $repInfo[[string]$rpx.codigo] = @{ fecha = $fch; chofer = $choR }
 }
 Log ("Repartos del mes ($mesActual): " + $repInfo.Count + " (sin cerrar: $repAbiertos)")
-if ($repInfo.Count -eq 0) { Log "ERROR: la API no devolvio repartos; NO se publica nada"; exit 1 }
+if ($repInfo.Count -eq 0) { Log "ERROR: la base no devolvio repartos; NO se publica nada"; exit 1 }
 
-# --- 2) Catalogos -----------------------------------------------------------
-$choferesRaw = Get-Api "ventas/api/v1/get-empleados?tipo=CHF"
+# --- 2) Catalogos (de la base) ----------------------------------------------
+# OJO: guardar la respuesta en una variable ANTES de recorrerla (bug con @(funcion)).
+# Choferes = empleados con el tipo CHF (Gescom no tiene una lista aparte).
+$resp = Get-Base "SELECT codigo, nombre FROM empleados WHERE ',' || tipos || ',' LIKE '%,CHF,%'"
 $mapaChofer = @{}
-foreach ($em in @($choferesRaw)) { $mapaChofer[[string]$em.codigo] = (([string]$em.nombre).Trim().ToUpper() -replace "\s+", " ") }
-$vendedoresRaw = Get-Api "ventas/api/v1/get-vendedores"
+foreach ($x in $resp) { $mapaChofer[[string]$x.codigo] = (([string]$x.nombre).Trim().ToUpper() -replace "\s+", " ") }
+$resp = Get-Base "SELECT codigo, nombre FROM vendedores"
 $mapaVend = @{}
-foreach ($vd in @($vendedoresRaw)) { $mapaVend[[string]$vd.codigo] = ([string]$vd.nombre).Trim() }
-$proveedoresRaw = Get-Api "compras/api/v1/get-proveedores?pagesize=500"
+foreach ($x in $resp) { $mapaVend[[string]$x.codigo] = ([string]$x.nombre).Trim() }
+$resp = Get-Base "SELECT codigo, nombre FROM proveedores"
 $mapaProvNombre = @{}
-foreach ($pv in @($proveedoresRaw)) { $mapaProvNombre[[string]$pv.codigo] = ([string]$pv.nombre).Trim() }
-# OJO: la paginacion (pagestoskip) de get-articulos NO avanza en esta instancia:
-# se baja todo de una (son ~1.600 articulos)
+foreach ($x in $resp) { $mapaProvNombre[[string]$x.codigo] = ([string]$x.nombre).Trim() }
+$resp = Get-Base "SELECT codigo, proveedor FROM articulos"
 $mapaArtProv = @{}
-$artRaw = Get-Api "inventario/api/v2/get-articulos?pagesize=5000"
-foreach ($ar in @($artRaw)) {
-  $cp = [string]$ar.codigoProveedor
-  if ($cp) { $mapaArtProv[[string]$ar.codigo] = $cp }
-}
+foreach ($x in $resp) { if ($x.proveedor) { $mapaArtProv[[string]$x.codigo] = [string]$x.proveedor } }
 Log ("Catalogos: " + $mapaChofer.Count + " choferes, " + $mapaVend.Count + " vendedores, " + $mapaProvNombre.Count + " proveedores, " + $mapaArtProv.Count + " articulos")
 
-# --- 3) Ventas (dia por dia, por fecha de CARGA, margen 21 dias) ------------
-$ventasPorId = @{}
-$diaDesc = $mesIniDt.AddDays(-21)
-$hastaDesc = (Get-Date).Date
-while ($diaDesc -le $hastaDesc) {
-  $dd1 = $diaDesc.ToString("yyyy-MM-dd")
-  $dd2 = $diaDesc.AddDays(1).ToString("yyyy-MM-dd")
-  $pagV = 0
-  $primerIdPrevio = ""
-  while ($true) {
-    $ventasRaw = Get-Api "ventas/api/v2/get?fechadesde=$dd1&fechahasta=$dd2&pagesize=500&pagestoskip=$pagV&pagestotake=1"
-    $listaVen = @($ventasRaw)
-    $primerId = ""; if ($listaVen.Count -gt 0) { $primerId = [string]$listaVen[0].id }
-    if ($pagV -gt 0 -and $primerId -eq $primerIdPrevio) { Log "AVISO: paginacion repetida en $dd1, se corta"; break }
-    $primerIdPrevio = $primerId
-    foreach ($vx in $listaVen) { $ventasPorId[[string]$vx.id] = $vx }
-    if ($listaVen.Count -lt 500 -or $pagV -ge 30) { break }
-    $pagV++
-    Start-Sleep -Milliseconds 500
-  }
-  Start-Sleep -Milliseconds 400
-  $diaDesc = $diaDesc.AddDays(1)
+# --- 3) Ventas (de la base) -------------------------------------------------
+# La MISMA ventana que antes se le pedia a la API: cargadas (ventas.fecha =
+# fechaPedido = dia de carga) entre mesIni-MARGEN y hoy, tipos VEN/DEV-RE/DEV-CA.
+# El margen existe porque una boleta entregada este mes pudo cargarse el mes
+# pasado (la preventa se carga antes de entregarse). Se arma cada venta con la
+# MISMA forma que devolvia la API, asi el calculo de abajo queda intacto.
+$MARGEN_DIAS = 7
+$desdeDt = $mesIniDt.AddDays(-$MARGEN_DIAS)
+$d1v = $desdeDt.ToString("yyyy-MM-dd")
+$filtroV = "v.fecha BETWEEN '" + $d1v + "' AND '" + $hoy + "' AND v.tipo IN ('VEN', 'DEV-RE', 'DEV-CA')"
+$ventasBase = Get-BasePaginado ("SELECT v.id, v.tipo, v.reparto, v.chofer, v.cliente, v.vendedor, v.empresa, " +
+  "v.fecha, v.entrega, v.directa, v.ref_id, v.nro_comprobante, v.total, v.motivo " +
+  "FROM ventas v WHERE " + $filtroV) "v.id"
+# Los articulos, ya sumados por venta y proveedor: el calculo solo necesita
+# unidades (cantidad x factor de empaque, en valor absoluto) e importe por
+# proveedor. Mismas cuentas que hacia item por item, pero devuelve ~1/3 de filas.
+$itemsBase = Get-BasePaginado ("SELECT i.venta_id AS vid, COALESCE(a.proveedor, '') AS prov, " +
+  "SUM(ABS(i.cantidad) * (CASE WHEN i.factor > 0 THEN i.factor ELSE 1 END)) AS unid, SUM(ABS(i.total)) AS imp " +
+  "FROM venta_items i JOIN ventas v ON v.id = i.venta_id LEFT JOIN articulos a ON a.codigo = i.articulo " +
+  "WHERE " + $filtroV + " GROUP BY i.venta_id, COALESCE(a.proveedor, '')") "vid, prov"
+$itemsPorVenta = @{}
+foreach ($f in $itemsBase) {
+  $kv = [string]$f.vid
+  if (-not $itemsPorVenta[$kv]) { $itemsPorVenta[$kv] = New-Object System.Collections.ArrayList }
+  # pseudo-renglon por proveedor: el factor ya va aplicado en unid, por eso 1
+  $ci = "P|" + [string]$f.prov
+  $mapaArtProv[$ci] = [string]$f.prov
+  [void]$itemsPorVenta[$kv].Add(@{ cantidad = [double]$f.unid; unidadFactor = 1; importeTotal = [double]$f.imp; codigoItem = $ci })
 }
-Log ("Ventas bajadas de la API: " + $ventasPorId.Count)
-if ($ventasPorId.Count -eq 0) { Log "ERROR: la API no devolvio ventas; NO se publica nada"; exit 1 }
+$ventasPorId = @{}
+foreach ($f in $ventasBase) {
+  $its = $itemsPorVenta[[string]$f.id]
+  if (-not $its) { $its = @() }
+  $ref = $null
+  if ($f.ref_id) { $ref = @{ id = $f.ref_id } }
+  $ventasPorId[[string]$f.id] = @{
+    id = $f.id; codigoTipoVenta = $f.tipo; codigoReparto = $f.reparto; codigoChofer = $f.chofer
+    codigoCliente = $f.cliente; codigoVendedor = $f.vendedor; codigoEmpresa = ([string]$f.empresa)
+    fechaPedido = $f.fecha; fechaEntrega = $f.entrega; ventaDirecta = ($f.directa -eq 1)
+    ventaReferenciada = $ref; numeroComprobante = ([string]$f.nro_comprobante); motivo = $f.motivo
+    importeTotal = $f.total; items = $its
+  }
+}
+Log ("Ventas de la base: " + $ventasPorId.Count + " (consultas hasta aca: " + $script:nConsultas + ")")
+if ($ventasPorId.Count -eq 0) { Log "ERROR: la base no devolvio ventas; NO se publica nada"; exit 1 }
 
 # --- 4) Efectividad OFICIAL por chofer/dia ----------------------------------
 $entregas = @{}
