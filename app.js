@@ -523,17 +523,16 @@
 
   // ---- Selector de MES (ver meses cerrados) -----------------------------
   function poblarSelectorMes() {
-    var wrap = $("#mes-wrap"), sel = $("#selector-mes");
+    var grupo = $("#mes-grupo"), sel = $("#selector-mes");
     if (!sel) return;
     var meses = STATE.mesesDisponibles || [];
-    if (meses.length < 2) { if (wrap) wrap.hidden = true; return; }
-    if (wrap) wrap.hidden = false;
+    if (meses.length < 2) { if (grupo) grupo.hidden = true; return; }
+    if (grupo) grupo.hidden = false;
     sel.innerHTML = "";
     meses.forEach(function (clave) {
       var p = clave.split("-");
-      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || clave);
-      nom = nom.charAt(0).toUpperCase() + nom.slice(1) + " " + p[0];
-      var o = el("option", null, (clave === STATE.mesClave ? "📅 " + nom + " (en curso)" : "🗓️ " + nom));
+      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || clave) + " " + p[0];
+      var o = el("option", null, (clave === STATE.mesClave ? nom + " (en curso)" : nom + " (cerrado)"));
       o.value = clave;
       sel.appendChild(o);
     });
@@ -564,17 +563,20 @@
   }
 
   function actualizarCabecera() {
-    var lbl = $("#update-date");
-    if (!lbl) return;
-    if (STATE.mesVisto && STATE.mesVisto !== STATE.mesClave) {
+    var caja = $(".hero__update");
+    if (!caja) return;
+    if (!caja._original) caja._original = caja.innerHTML;
+    if (STATE.mesVisto && STATE.mesClave && STATE.mesVisto !== STATE.mesClave) {
       var p = STATE.mesVisto.split("-");
-      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || STATE.mesVisto);
-      lbl.textContent = nom.charAt(0).toUpperCase() + nom.slice(1) + " " + p[0] + " · cerrado";
+      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || STATE.mesVisto) + " " + p[0];
+      caja.innerHTML = '<span class="dot dot--cerrado"></span> Mes cerrado: <b id="update-date">' + nom + '</b>';
       return;
     }
+    caja.innerHTML = caja._original;
     var max = "";
     (STATE.datos.registros || []).forEach(function (r) { if (r.fecha > max) max = r.fecha; });
-    lbl.textContent = max ? fmtFecha(max) + " de " + (max.split("-")[0]) : "—";
+    var lbl = $("#update-date");
+    if (lbl) lbl.textContent = max ? fmtFecha(max) + " de " + (max.split("-")[0]) : "—";
   }
 
   function empaquetar(d) {
