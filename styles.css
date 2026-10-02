@@ -113,7 +113,9 @@ b { font-weight: 700; }
 .controls__in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .controls label { font-size: 13px; font-weight: 700; color: #B8C4CE; }
 .select-wrap { position: relative; flex: 1; min-width: 200px; max-width: 380px; }
-.select-wrap--mes { flex: 0 1 auto; min-width: 150px; max-width: 230px; }
+.mesgrupo { display: flex; align-items: center; gap: 12px; flex: 1 1 240px; max-width: 320px; }
+.select-wrap--mes { max-width: 260px; min-width: 170px; }
+.hero__update .dot--cerrado { background: #E2B04A !important; box-shadow: 0 0 0 4px rgba(226, 176, 74, .25) !important; }
 .select-wrap::after {
   content: "▾"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
   pointer-events: none; color: var(--steel); font-size: 13px;
