@@ -421,13 +421,15 @@ function NombreMostrar($chofer) {
 $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine("/* GENERADO AUTOMATICAMENTE por robot-nube.ps1 (API Gescom, GitHub Actions) - NO EDITAR A MANO")
 [void]$sb.AppendLine("   Ultima actualizacion: " + (Get-Date -Format "yyyy-MM-dd HH:mm") + " */")
+$regsJson = New-Object System.Collections.ArrayList   # mismos registros, para el archivo del mes
 [void]$sb.AppendLine("window.__LPE_DATA__ = { registros: [")
 $primero = $true
 foreach ($clave in $claves) {
   $pcl = $clave.Split("|"); $fechaR = $pcl[0]; $choferR = $pcl[1]
   $ee = $entregas[$clave]
-  $coma = ","; if ($primero) { $coma = " "; $primero = $false }
   $json = '{"fecha":"' + $fechaR + '","fletero":"' + (NombreMostrar $choferR) + '","repartos":' + $ee.reps.Count + ',"boletas":' + $ee.asig + ',"entregadas":' + $ee.real + ',"itemsRech":' + [int][Math]::Round($ee.itemsRech) + '}'
+  [void]$regsJson.Add($json)
+  $coma = ","; if ($primero) { $coma = " "; $primero = $false }
   [void]$sb.AppendLine($coma + $json)
 }
 [void]$sb.AppendLine("] };")
@@ -559,6 +561,34 @@ if ($ma) {
 }
 
 $utf8 = New-Object System.Text.UTF8Encoding($false)
+
+# --- Archivo del MES (para ver los meses cerrados en la web) ----------------
+# El MISMO paquete que __LPE_DATA__ pero como JSON puro, uno por mes. El mes en
+# curso se reescribe en cada corrida; en FORCE_MES se reescribe el mes refrescado
+# -> si un mes cerrado cambia por el cierre de camiones, su archivo se actualiza
+# solo. La web los baja con fetch cuando se elige un mes en el selector.
+$cuerpoMes = '{"registros":[' + ($regsJson -join ",") + '],' +
+  '"empresas":[' + ($jEmp -join ",") + '],' +
+  '"clientes":{"sac":' + $cliSac + ',"ent":' + $cliEnt + '},' +
+  '"boletasCsv":{"sac":' + $bolSac + ',"rech":' + $bolCompTot + '},' +
+  '"rechazoPlata":{"general":' + ($rLP + $rEL) + ',"lagopuelo":' + $rLP + ',"elebes":' + $rEL + '},' +
+  '"motivos":[' + ($listaMot -join ",") + '],' +
+  '"motivosPorFletero":{' + ($porFle -join ",") + '},' +
+  '"estadisticasFletero":{' + ($statsJson -join ",") + '},' +
+  '"vendedoresTop":[' + ($jVend -join ",") + '],' +
+  '"proveedoresTop":[' + ($jProvTop -join ",") + '],' +
+  '"proveedoresPorFletero":{' + ($jFleProv -join ",") + '},' +
+  '"clave":"' + $mesActual + '","actualizado":"' + (Get-Date -Format "yyyy-MM-dd") + '"}'
+$carpetaMeses = Join-Path $CARPETA_PROYECTO "meses"
+if (-not (Test-Path $carpetaMeses)) { New-Item -ItemType Directory -Force $carpetaMeses | Out-Null }
+[System.IO.File]::WriteAllText((Join-Path $carpetaMeses ($mesActual + ".json")), $cuerpoMes, $utf8)
+Log ("Archivo del mes escrito: meses/" + $mesActual + ".json")
+# Lista de meses con archivo (para el selector de la web), el mas nuevo primero
+$mesesDisp = @(Get-ChildItem $carpetaMeses -Filter "*.json" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName } | Sort-Object -Descending)
+$jMeses = @($mesesDisp | ForEach-Object { '"' + $_ + '"' })
+[void]$sb.AppendLine('window.__LPE_DATA__.mesClave = "' + $mesActual + '";')
+[void]$sb.AppendLine("window.__LPE_DATA__.mesesDisponibles = [" + ($jMeses -join ",") + "];")
+
 if (-not $EN_NUBE) {
   $salidaPrueba = Join-Path $CARPETA_PROYECTO "robot\data-nube-prueba.js"
   [System.IO.File]::WriteAllText($salidaPrueba, $sb.ToString(), $utf8)
