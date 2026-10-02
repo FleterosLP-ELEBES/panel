@@ -7,7 +7,7 @@
   <meta name="description" content="Efectividad de entrega y cantidad de repartos de los fleteros de Lago Puelo S.A. y Elebes S.A." />
   <meta name="theme-color" content="#1C2B3A" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231C2B3A'/%3E%3Ctext x='50' y='64' font-family='Arial' font-size='34' font-weight='bold' fill='white' text-anchor='middle'%3EL·E%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="styles.css?v=20261002b" />
+  <link rel="stylesheet" href="styles.css?v=20261002c" />
   <style>
     /* Foto de fondo del encabezado (se ve al dejar la imagen en assets/img/fondo-superior.jpg).
        Si el archivo no existe, se muestra el degradado de marca. */
@@ -49,13 +49,16 @@
   <div class="controls">
     <div class="controls__in">
       <label for="selector">Ver:</label>
-      <div class="select-wrap select-wrap--mes" id="mes-wrap" hidden>
-        <select id="selector-mes" aria-label="Elegí el mes"></select>
-      </div>
       <div class="select-wrap">
         <select id="selector" aria-label="Elegí un fletero o el resumen general">
           <option value="__general__">Resumen general</option>
         </select>
+      </div>
+      <div class="mesgrupo" id="mes-grupo" hidden>
+        <label for="selector-mes">Mes:</label>
+        <div class="select-wrap select-wrap--mes">
+          <select id="selector-mes" aria-label="Elegí el mes"></select>
+        </div>
       </div>
     </div>
   </div>
@@ -72,7 +75,7 @@
   </footer>
 
   <!-- Datos primero, lógica después (patrón IIFE, sin módulos ES) -->
-  <script defer src="data.js?v=20261002b"></script>
-  <script defer src="app.js?v=20261002b"></script>
+  <script defer src="data.js?v=20261002c"></script>
+  <script defer src="app.js?v=20261002c"></script>
 </body>
 </html>
