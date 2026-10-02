@@ -139,6 +139,8 @@
   // el mes anterior ya cerrado con números finales. Con ?cierre=1 se puede forzar
   // para previsualizarla cualquier día. Se puede cerrar (vuelve el mes siguiente).
   function tarjetaCierreMes(datos) {
+    // Solo en el mes en curso: cuando se mira un mes cerrado por el selector, no va.
+    if (STATE.mesVisto && STATE.mesClave && STATE.mesVisto !== STATE.mesClave) return null;
     var ma = datos.mesAnterior;
     if (!ma) return null;
     var forzar = /[?&]cierre=1/.test(location.search);
@@ -510,33 +512,78 @@
       o.value = n;
       sel.appendChild(o);
     });
-    sel.addEventListener("change", function () { seleccionar(sel.value); });
-
-    // Recordar selección previa (útil para el celular de cada fletero)
-    var prev = null;
-    try { prev = localStorage.getItem("lpe_fletero"); } catch (e) {}
-    if (prev && (prev === "__general__" || m.porFletero[prev])) {
-      STATE.seleccion = prev;
-      sel.value = prev;
+    sel.onchange = function () { seleccionar(sel.value); };
+    // Dejar el selector en la vista actual (si el fletero existe en este mes)
+    if (STATE.seleccion === "__general__" || m.porFletero[STATE.seleccion]) {
+      sel.value = STATE.seleccion;
+    } else {
+      STATE.seleccion = "__general__"; sel.value = "__general__";
     }
   }
 
-  function ultimaActualizacion(registros) {
-    var max = "";
-    registros.forEach(function (r) { if (r.fecha > max) max = r.fecha; });
-    var lbl = $("#update-date");
-    if (lbl) lbl.textContent = max ? fmtFecha(max) + " de " + (max.split("-")[0]) : "—";
+  // ---- Selector de MES (ver meses cerrados) -----------------------------
+  function poblarSelectorMes() {
+    var wrap = $("#mes-wrap"), sel = $("#selector-mes");
+    if (!sel) return;
+    var meses = STATE.mesesDisponibles || [];
+    if (meses.length < 2) { if (wrap) wrap.hidden = true; return; }
+    if (wrap) wrap.hidden = false;
+    sel.innerHTML = "";
+    meses.forEach(function (clave) {
+      var p = clave.split("-");
+      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || clave);
+      nom = nom.charAt(0).toUpperCase() + nom.slice(1) + " " + p[0];
+      var o = el("option", null, (clave === STATE.mesClave ? "📅 " + nom + " (en curso)" : "🗓️ " + nom));
+      o.value = clave;
+      sel.appendChild(o);
+    });
+    sel.value = STATE.mesVisto;
+    sel.onchange = function () { cambiarMes(sel.value); };
   }
 
-  function cargar() {
-    var d = window.__LPE_DATA__ || {};
-    STATE.datos = {
+  function cambiarMes(clave) {
+    STATE.seleccion = "__general__";
+    if (STATE.cacheMeses[clave]) { aplicarMes(clave, STATE.cacheMeses[clave]); return; }
+    var panel = $("#panel");
+    if (panel) panel.innerHTML = '<p class="muted">Cargando el mes…</p>';
+    fetch("meses/" + clave + ".json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) { var paq = empaquetar(d); STATE.cacheMeses[clave] = paq; aplicarMes(clave, paq); })
+      .catch(function () { if (panel) panel.innerHTML = '<p class="muted">No se pudo cargar ese mes. Probá de nuevo.</p>'; });
+  }
+
+  function aplicarMes(clave, paq) {
+    STATE.mesVisto = clave;
+    STATE.datos = paq;
+    STATE.seleccion = "__general__";
+    poblarSelector();
+    var selM = $("#selector-mes"); if (selM) selM.value = clave;
+    actualizarCabecera();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function actualizarCabecera() {
+    var lbl = $("#update-date");
+    if (!lbl) return;
+    if (STATE.mesVisto && STATE.mesVisto !== STATE.mesClave) {
+      var p = STATE.mesVisto.split("-");
+      var nom = (NOMBRES_MES[parseInt(p[1], 10) - 1] || STATE.mesVisto);
+      lbl.textContent = nom.charAt(0).toUpperCase() + nom.slice(1) + " " + p[0] + " · cerrado";
+      return;
+    }
+    var max = "";
+    (STATE.datos.registros || []).forEach(function (r) { if (r.fecha > max) max = r.fecha; });
+    lbl.textContent = max ? fmtFecha(max) + " de " + (max.split("-")[0]) : "—";
+  }
+
+  function empaquetar(d) {
+    return {
       registros: d.registros || [],
       empresas: d.empresas || [],
       clientes: d.clientes || null,
       boletasCsv: d.boletasCsv || null,
       rechazoPlata: d.rechazoPlata || null,
-      boletasCsv: d.boletasCsv || null,
       motivos: d.motivos || [],
       motivosPorFletero: d.motivosPorFletero || {},
       estadisticasFletero: d.estadisticasFletero || {},
@@ -545,7 +592,24 @@
       proveedoresPorFletero: d.proveedoresPorFletero || {},
       mesAnterior: d.mesAnterior || null
     };
-    ultimaActualizacion(STATE.datos.registros);
+  }
+
+  function cargar() {
+    var d = window.__LPE_DATA__ || {};
+    STATE.datosActual = empaquetar(d);
+    STATE.mesClave = d.mesClave || "";
+    STATE.mesVisto = STATE.mesClave;
+    STATE.mesesDisponibles = d.mesesDisponibles || [];
+    STATE.cacheMeses = {};
+    if (STATE.mesClave) STATE.cacheMeses[STATE.mesClave] = STATE.datosActual;
+    STATE.datos = STATE.datosActual;
+    // Recordar seleccion previa (solo en la carga inicial, mes en curso)
+    var prev = null;
+    try { prev = localStorage.getItem("lpe_fletero"); } catch (e) {}
+    var m0 = resumenMes(STATE.datos);
+    if (prev && (prev === "__general__" || m0.porFletero[prev])) { STATE.seleccion = prev; }
+    poblarSelectorMes();
+    actualizarCabecera();
     poblarSelector();
     render();
   }
