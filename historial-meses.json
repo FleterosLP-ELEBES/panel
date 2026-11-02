@@ -229,6 +229,96 @@
                     "actualizado":  "2026-09-08",
                     "efGeneral":  90.4
                 },
+    "2026-11":  {
+                    "clientesSac":  241,
+                    "repartos":  14,
+                    "cierreFinal":  false,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  0,
+                                                    "ef":  100,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  286
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  0,
+                                                       "ef":  100,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  229
+                                                   }
+                                 },
+                    "plataRech":  0,
+                    "boletasSac":  515,
+                    "entregadas":  556,
+                    "ranking":  [
+                                    {
+                                        "nombre":  "Ivan Montoya",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Juan Escoto",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Nahuel Montoya",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Walter Janiuk",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    }
+                                ],
+                    "boletas":  556,
+                    "clientesEnt":  241,
+                    "boletasRech":  0,
+                    "fleteros":  12,
+                    "actualizado":  "2026-11-02",
+                    "efGeneral":  100
+                },
     "2026-09":  {
                     "clientesSac":  4867,
                     "repartos":  314,
