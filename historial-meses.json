@@ -1,4 +1,209 @@
 {
+    "2026-11":  {
+                    "clientesSac":  421,
+                    "repartos":  26,
+                    "cierreFinal":  false,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  20,
+                                                    "ef":  95.8,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  471
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  15,
+                                                       "ef":  96.8,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  468
+                                                   }
+                                 },
+                    "plataRech":  1635098,
+                    "boletasSac":  939,
+                    "entregadas":  977,
+                    "ranking":  [
+                                    {
+                                        "nombre":  "Emiliano Juan Amarilla",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Walter Janiuk",
+                                        "repartos":  3,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Nahuel Montoya",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  2,
+                                        "ef":  98
+                                    },
+                                    {
+                                        "nombre":  "Ivan Montoya",
+                                        "repartos":  2,
+                                        "ef":  97.9
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  2,
+                                        "ef":  97.5
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  2,
+                                        "ef":  97.2
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
+                                        "repartos":  2,
+                                        "ef":  96.6
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  2,
+                                        "ef":  96.2
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  2,
+                                        "ef":  95.7
+                                    },
+                                    {
+                                        "nombre":  "Juan Escoto",
+                                        "repartos":  2,
+                                        "ef":  95.6
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  2,
+                                        "ef":  94.3
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  2,
+                                        "ef":  91.2
+                                    }
+                                ],
+                    "boletas":  1012,
+                    "clientesEnt":  413,
+                    "boletasRech":  22,
+                    "fleteros":  13,
+                    "actualizado":  "2026-11-03",
+                    "efGeneral":  96.5
+                },
+    "2026-09":  {
+                    "clientesSac":  4867,
+                    "repartos":  314,
+                    "cierreFinal":  false,
+                    "empresas":  {
+                                     "elebes":  {
+                                                    "rechazadas":  488,
+                                                    "ef":  91.3,
+                                                    "nombre":  "Elebes S.A.",
+                                                    "boletas":  5622
+                                                },
+                                     "lagopuelo":  {
+                                                       "rechazadas":  414,
+                                                       "ef":  91.7,
+                                                       "nombre":  "Lago Puelo S.A.",
+                                                       "boletas":  4968
+                                                   }
+                                 },
+                    "plataRech":  48776875,
+                    "boletasSac":  10590,
+                    "entregadas":  10350,
+                    "ranking":  [
+                                    {
+                                        "nombre":  "Leo Semi",
+                                        "repartos":  1,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Marcelo Vacca",
+                                        "repartos":  2,
+                                        "ef":  100
+                                    },
+                                    {
+                                        "nombre":  "Emiliano Juan Amarilla",
+                                        "repartos":  22,
+                                        "ef":  95.4
+                                    },
+                                    {
+                                        "nombre":  "Juan Escoto",
+                                        "repartos":  26,
+                                        "ef":  95.3
+                                    },
+                                    {
+                                        "nombre":  "Claudio Garcia",
+                                        "repartos":  26,
+                                        "ef":  93.9
+                                    },
+                                    {
+                                        "nombre":  "Walter Janiuk",
+                                        "repartos":  23,
+                                        "ef":  93.1
+                                    },
+                                    {
+                                        "nombre":  "Miguel Angel Pallini",
+                                        "repartos":  17,
+                                        "ef":  92.7
+                                    },
+                                    {
+                                        "nombre":  "Marcos Sanchez",
+                                        "repartos":  23,
+                                        "ef":  92.5
+                                    },
+                                    {
+                                        "nombre":  "Leonardo Santa Cruz",
+                                        "repartos":  20,
+                                        "ef":  92
+                                    },
+                                    {
+                                        "nombre":  "Hernan Rivero",
+                                        "repartos":  23,
+                                        "ef":  91.4
+                                    },
+                                    {
+                                        "nombre":  "Luciano Gasparini",
+                                        "repartos":  19,
+                                        "ef":  91.3
+                                    },
+                                    {
+                                        "nombre":  "Mariano Sosa",
+                                        "repartos":  28,
+                                        "ef":  90.6
+                                    },
+                                    {
+                                        "nombre":  "Simon Olivera",
+                                        "repartos":  24,
+                                        "ef":  90.3
+                                    },
+                                    {
+                                        "nombre":  "Nahuel Montoya",
+                                        "repartos":  17,
+                                        "ef":  88.9
+                                    },
+                                    {
+                                        "nombre":  "Ivan Montoya",
+                                        "repartos":  22,
+                                        "ef":  88.4
+                                    },
+                                    {
+                                        "nombre":  "Diego Zacarias",
+                                        "repartos":  21,
+                                        "ef":  87.8
+                                    }
+                                ],
+                    "boletas":  11263,
+                    "clientesEnt":  4643,
+                    "boletasRech":  596,
+                    "fleteros":  16,
+                    "actualizado":  "2026-10-15",
+                    "efGeneral":  91.9
+                },
     "2026-07":  {
                     "clientesSac":  4485,
                     "repartos":  274,
@@ -228,206 +433,6 @@
                     "fleteros":  18,
                     "actualizado":  "2026-09-08",
                     "efGeneral":  90.4
-                },
-    "2026-11":  {
-                    "clientesSac":  241,
-                    "repartos":  14,
-                    "cierreFinal":  false,
-                    "empresas":  {
-                                     "elebes":  {
-                                                    "rechazadas":  0,
-                                                    "ef":  100,
-                                                    "nombre":  "Elebes S.A.",
-                                                    "boletas":  286
-                                                },
-                                     "lagopuelo":  {
-                                                       "rechazadas":  0,
-                                                       "ef":  100,
-                                                       "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  229
-                                                   }
-                                 },
-                    "plataRech":  0,
-                    "boletasSac":  515,
-                    "entregadas":  556,
-                    "ranking":  [
-                                    {
-                                        "nombre":  "Ivan Montoya",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Claudio Garcia",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Mariano Sosa",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Juan Escoto",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Leonardo Santa Cruz",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Marcos Sanchez",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Simon Olivera",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Miguel Angel Pallini",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Diego Zacarias",
-                                        "repartos":  2,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Hernan Rivero",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Nahuel Montoya",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Walter Janiuk",
-                                        "repartos":  2,
-                                        "ef":  100
-                                    }
-                                ],
-                    "boletas":  556,
-                    "clientesEnt":  241,
-                    "boletasRech":  0,
-                    "fleteros":  12,
-                    "actualizado":  "2026-11-02",
-                    "efGeneral":  100
-                },
-    "2026-09":  {
-                    "clientesSac":  4867,
-                    "repartos":  314,
-                    "cierreFinal":  false,
-                    "empresas":  {
-                                     "elebes":  {
-                                                    "rechazadas":  488,
-                                                    "ef":  91.3,
-                                                    "nombre":  "Elebes S.A.",
-                                                    "boletas":  5622
-                                                },
-                                     "lagopuelo":  {
-                                                       "rechazadas":  414,
-                                                       "ef":  91.7,
-                                                       "nombre":  "Lago Puelo S.A.",
-                                                       "boletas":  4968
-                                                   }
-                                 },
-                    "plataRech":  48776875,
-                    "boletasSac":  10590,
-                    "entregadas":  10350,
-                    "ranking":  [
-                                    {
-                                        "nombre":  "Leo Semi",
-                                        "repartos":  1,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Marcelo Vacca",
-                                        "repartos":  2,
-                                        "ef":  100
-                                    },
-                                    {
-                                        "nombre":  "Emiliano Juan Amarilla",
-                                        "repartos":  22,
-                                        "ef":  95.4
-                                    },
-                                    {
-                                        "nombre":  "Juan Escoto",
-                                        "repartos":  26,
-                                        "ef":  95.3
-                                    },
-                                    {
-                                        "nombre":  "Claudio Garcia",
-                                        "repartos":  26,
-                                        "ef":  93.9
-                                    },
-                                    {
-                                        "nombre":  "Walter Janiuk",
-                                        "repartos":  23,
-                                        "ef":  93.1
-                                    },
-                                    {
-                                        "nombre":  "Miguel Angel Pallini",
-                                        "repartos":  17,
-                                        "ef":  92.7
-                                    },
-                                    {
-                                        "nombre":  "Marcos Sanchez",
-                                        "repartos":  23,
-                                        "ef":  92.5
-                                    },
-                                    {
-                                        "nombre":  "Leonardo Santa Cruz",
-                                        "repartos":  20,
-                                        "ef":  92
-                                    },
-                                    {
-                                        "nombre":  "Hernan Rivero",
-                                        "repartos":  23,
-                                        "ef":  91.4
-                                    },
-                                    {
-                                        "nombre":  "Luciano Gasparini",
-                                        "repartos":  19,
-                                        "ef":  91.3
-                                    },
-                                    {
-                                        "nombre":  "Mariano Sosa",
-                                        "repartos":  28,
-                                        "ef":  90.6
-                                    },
-                                    {
-                                        "nombre":  "Simon Olivera",
-                                        "repartos":  24,
-                                        "ef":  90.3
-                                    },
-                                    {
-                                        "nombre":  "Nahuel Montoya",
-                                        "repartos":  17,
-                                        "ef":  88.9
-                                    },
-                                    {
-                                        "nombre":  "Ivan Montoya",
-                                        "repartos":  22,
-                                        "ef":  88.4
-                                    },
-                                    {
-                                        "nombre":  "Diego Zacarias",
-                                        "repartos":  21,
-                                        "ef":  87.8
-                                    }
-                                ],
-                    "boletas":  11263,
-                    "clientesEnt":  4643,
-                    "boletasRech":  596,
-                    "fleteros":  16,
-                    "actualizado":  "2026-10-15",
-                    "efGeneral":  91.9
                 },
     "2026-10":  {
                     "clientesSac":  4987,
